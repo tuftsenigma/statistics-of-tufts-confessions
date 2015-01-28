@@ -1,26 +1,16 @@
 from pymongo import MongoClient
+import sys
 
-#
-# DB globals / singletons
-#
-# --twdb cllxn naming--
-#
-# foo_f = raw followers of profile 'foo'
-# foo_c = cleaned json records of profile 'foo'
-# foo_q = query stream users of token 'foo'
-#
+'''
+Connect to cloud client db
+'''
 
-
-dbport  = '27017'
-dbhost  = 'localhost'
-dburi   = 'mongodb://' + dbhost + ':' + dbport
-dfdb    = 'twdb'
-
-class DBStore():
-	def __init__(self, uri=dburi, dbname=dfdb):
-		self.mongo_cl = MongoClient(uri)
-		self.db = self.mongo_cl[dbname]
-		self.name = dbname
+class DBCloudStore():
+	def __init__(self, host, port, db, usr, psswd):
+		self.connection = MongoClient(host, port)
+		self.db = self.connection[db]
+		self.db.authenticate(usr, psswd)
+		self.name = self.db
 
 	def getName(self):
 		return self.name

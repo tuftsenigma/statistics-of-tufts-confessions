@@ -13,7 +13,14 @@ Script to mine public FB data
 """
 GLOBAL SPACE
 """
-DB = DBStore(dbname="tuftsdb")
+
+dbusr = 'trends_admin'
+dbpsswd = 'jumboni'
+dbname = 'tufts_trends'
+dbport  = '31651'
+dbhost  = 'ds03651'
+
+DB = DBCloudStore(dbhost, dbport, dbname, dbusr, dbpsswd) 
 
 # Access credentials
 AccessToken = "CAACEdEose0cBANeHjrTuk3Uppaqj5LEdp5lUMIKoD7lNnIZC0uGpBgPVDn1pSqEzTfQYx6GTAuykZAINZB2LWkscqdeCGWW6gZAABeqcsHL0kLmcnIEiX04cy0LE114stObT6GRZB5u3I7rBjdzcPdXttG4kjVDZBedVxL2XMhaUMTlno71ZBeJusQm2t8ERPhFgTiZCvg6lBoovVIaAGZBVh"
