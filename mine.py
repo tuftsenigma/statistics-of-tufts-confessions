@@ -14,13 +14,14 @@ Script to mine public FB data
 GLOBAL SPACE
 """
 
+# Data store
 dbusr = 'trends_admin'
 dbpsswd = 'jumboni'
+dbhost  = 'ds031651.mongolab.com'
+dbport  = 31651
 dbname = 'tufts_trends'
-dbport  = '31651'
-dbhost  = 'ds03651'
 
-DB = DBCloudStore(dbhost, dbport, dbname, dbusr, dbpsswd) 
+DB = DBCloudStore(host=dbhost, port=dbport, db=dbname, usr=dbusr, psswd=dbpsswd) 
 
 # Access credentials
 AccessToken = "CAACEdEose0cBANeHjrTuk3Uppaqj5LEdp5lUMIKoD7lNnIZC0uGpBgPVDn1pSqEzTfQYx6GTAuykZAINZB2LWkscqdeCGWW6gZAABeqcsHL0kLmcnIEiX04cy0LE114stObT6GRZB5u3I7rBjdzcPdXttG4kjVDZBedVxL2XMhaUMTlno71ZBeJusQm2t8ERPhFgTiZCvg6lBoovVIaAGZBVh"
@@ -58,6 +59,7 @@ FBKeys = [
 SCRIPT SPACE
 """
 def getURL(src):
+	"""input a FB group / page and return graph API URL"""
 	global TuftsFB, AccessToken
 	_ID = TuftsFB["groups"][src] if src in TuftsFB["groups"] else TuftsFB["pages"][src]
 	if _ID:
@@ -65,14 +67,17 @@ def getURL(src):
 	else:
 		return ""
 
+def dedup(src):
+	"""iterate through DB collection corresponding to src and dedup keys"""
+
 def mine(src):
-	"""crawl data from src and write to db"""
+	"""crawl data from FB group or page (src) and write to db w/src as cllxn id"""
 	global DB
 	_URL = getURL(src)
 	res = requests.get(_URL)
 	pg = 0
 	print "writing to mongo store '{}'".format(DB.getName())
-	while res.status_code == 200:
+	while True:
 		pg += 1
 		print "page [{}]".format(pg)
 		dat = res.json()
@@ -81,11 +86,22 @@ def mine(src):
 			if src == "TuftsConfessions":
 				del d["privacy"]
 				del d["from"]
-			DB.write(src, d)
-		if not dat["paging"]["next"]:
+
+			if DB.find(src, { "id" : d["id"]}): # don't write duplicate documents
+				print "<document already exists...did not write to DB>"
+			else:
+				DB.write(src, d)
+		try:
+			if not dat["paging"]["next"]:
+				break
+		except KeyError:
+			print res.json()
 			break
 		else:
 			res = requests.get(dat["paging"]["next"])
+			while res.status_code != 200:
+				print res.json()
+				time.sleep(200)
 
 
 if __name__ == '__main__':
