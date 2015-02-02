@@ -1,12 +1,12 @@
-score	count
-0.0	1
-0.1	74
-0.2	451
-0.3 499
-0.4	576
-0.5	490
-0.6	290
-0.7	140
-0.8	75
-0.9	13
-1.0	0
+score	count	words
+0.0	1	I hate everything
+0.1	74	I hate nearly everything
+0.2	451	I hate most things
+0.3	499	I hate some things
+0.4	576	I hate a few things
+0.5	490	I'm indifferent
+0.6	290	I like a few things
+0.7	140	I like some things
+0.8	75	I like most things
+0.9	13	I like nearly everything
+1.0	0	YAY!

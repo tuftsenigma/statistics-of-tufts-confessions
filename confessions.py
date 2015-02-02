@@ -29,7 +29,7 @@ Scripts used for 'TuftsConfessions' analysis
 
 DATA TO GET:
 1. popular words -- top trigrams vs specific Tufts trigrams x
-2. sentiment score vs frequenct vis 
+2. sentiment score vs frequency vis -- need to actually write sentiment score to db, b/c throttled over time.. redo
 3. LDA into good topics and map against popularity
 4. daily, monthly trends
 5. correlation between sentiment and likes (?)
@@ -48,8 +48,8 @@ DB = DBCloudStore(host=dbhost, port=dbport, db=dbname, usr=dbusr, psswd=dbpsswd)
 
 def model_topics(docs, terms):
 	'''Run Latent Dirichlet Allocation on docs x terms'''
-	NUM_TOPICS = 13
-	NUM_WORDS  = 15
+	NUM_TOPICS = 10
+	NUM_WORDS  = 16
 	dictionary = corpora.Dictionary(docs) # map words to ids
 	corpus = [dictionary.doc2bow(d) for d in docs] # create sparse vector of doc word-counts
 
@@ -84,7 +84,7 @@ def get_raw_docs(cllxn):
 def munge_and_dump_posts(cllxn):
 	'''Pull from database, clean FB post documents and cache them in order
 	to have fast access for further analysis'''
-	more_stopwords = ["could", "every", "would", "even", "get", "like", "re", "really", "www", "http", "com", "ve", "1", "watch", "youtube", "https", "tufts", "one", "two", "guy", "girl"]
+	more_stopwords = ["hey", "doesn", "much", "didn", "could", "every", "would", "even", "get", "like", "re", "really", "www", "http", "com", "ve", "1", "watch", "youtube", "https", "tufts", "one", "two", "guy", "girl"]
 
 	confessions = DB.read(cllxn)
 	posts = confessions.find()
@@ -168,18 +168,19 @@ def sentiment_analysis(cllxn):
 		count += 1
 		print "collected {} documents".format(count)
 		try:
-			doc = post["message"].encode('utf-8')
-			docs.append(doc)
+			if not post["sentiment"]:
+				doc = (post["message"].encode('utf-8'), post["id"])
+				docs.append(doc)
 		except KeyError:
 			continue
 
 	count = 0
 	for doc in docs:
-		# sentiment analysis
 		count += 1
 		print "analyzed {} documents".format(count)
-		pt = get_sentiment(doc)
+		pt = get_sentiment(doc[0])
 		if pt:
+			DB.update(cllxn, "sentiment", round(pt, 1))
 			data[round(pt, 1)] += 1
 
 	slogger.info("total words={}".format(len(list(vocab))))
@@ -187,12 +188,6 @@ def sentiment_analysis(cllxn):
 	slogger.info(data)
 	print data
 
-	fig = plt.figure()
-	plt.bar([d for d in data], [data[d] for d in data], align="center")
-	plt.xlabel("Polarity")
-	plt.ylabel("Frequency")
-	plt.title("Sentiment Analysis")
-	plt.show()
 
 def get_sentiment(msg):
 	"""use third party API to get polarity on msg text"""
