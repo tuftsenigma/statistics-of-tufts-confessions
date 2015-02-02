@@ -1,11 +1,13 @@
 import	re
 import	time
 import	os
+import  requests
 import	datetime
 import	sys
 import 	nltk
 import	json
 import 	gensim
+import	decimal
 import 	jsonpickle
 import	pickle
 import 	numpy as np
@@ -19,6 +21,7 @@ from	gensim 				import corpora, models, similarities
 from 	db 					import DBCloudStore
 from 	os 					import path
 from	slog 				import *
+from 	matplotlib			import pyplot as plt
 
 
 """
@@ -28,7 +31,7 @@ DATA TO GET:
 1. popular words -- top trigrams vs specific Tufts trigrams x
 2. sentiment score vs frequenct vis 
 3. LDA into good topics and map against popularity
-4. hourly, daily, monthly trends
+4. daily, monthly trends
 5. correlation between sentiment and likes (?)
 
 """
@@ -149,13 +152,60 @@ def popular_trigrams(docs):
 		print "< {}, {}, {} > freq= {}, score={}".format(tri[0], tri[1], tri[2], tri_tokens.count(tri), score)
 	time.sleep(10)
 
+def sentiment_analysis(cllxn):
+	"""plot sentiment analysis on dataset"""
+	# more_stopwords = ["could", "every", "would", "even", "get", "like", "re", "really", "www", "http", "com", "ve", "1", "watch", "youtube", "https", "tufts", "one", "two", "guy", "girl"]
+
+	confessions = DB.read(cllxn)
+	posts = confessions.find()
+	docs = []
+	vocab = Set([])
+	data = { 0.0 : 0, 0.1 : 0, 0.2 : 0, 0.3 : 0, 0.4 : 0, 0.5 : 0, 0.6 : 0, 0.7 : 0, 0.8 : 0, 0.9 : 0, 1.0 : 0 }
+
+	count = 0
+	for post in posts:
+		# collect post from database
+		count += 1
+		print "collected {} documents".format(count)
+		try:
+			doc = post["message"].encode('utf-8')
+			docs.append(doc)
+		except KeyError:
+			continue
+
+	count = 0
+	for doc in docs:
+		# sentiment analysis
+		count += 1
+		print "analyzed {} documents".format(count)
+		pt = get_sentiment(doc)
+		if pt:
+			data[round(pt, 1)] += 1
+
+	slogger.info("total words={}".format(len(list(vocab))))
+	slogger.info("total docs={}".format(len(docs)))
+	slogger.info(data)
+	print data
+
+	fig = plt.figure()
+	plt.bar([d for d in data], [data[d] for d in data], align="center")
+	plt.xlabel("Polarity")
+	plt.ylabel("Frequency")
+	plt.title("Sentiment Analysis")
+	plt.show()
+
+def get_sentiment(msg):
+	"""use third party API to get polarity on msg text"""
+	API = "http://text-processing.com/api/sentiment/"
+	res = requests.post(API, data={ 'text'  : msg })
+	if res.status_code == 200:
+		return res.json()["probability"]["pos"]
+	else:
+		print "error in retrieving sentiment analysis"
+		return ""
+
 
 if __name__ == '__main__':
-	exp_lookup = [
-		"popular_bigrams",
-		"popular_trigrams",
-		"model_topics"
-	]
 
 	if len(sys.argv) > 1:
 		try:
@@ -177,11 +227,11 @@ if __name__ == '__main__':
 	texts = get_raw_docs(cllxn)
 
 	for e in exps:
-		if e == exp_lookup[0]:
+		if e == "popular_bigrams":
 			popular_bigrams(texts)
-		if e == exp_lookup[1]:
+		if e == "popular_trigrams":
 			popular_trigrams(texts)
-		if e == exp_lookup[2]:
+		if e == "model_topics":
 			cache_path = path.relpath('cache/{}.pkl'.format(cllxn))
 			with open(cache_path, 'rb') as cache:
 				# try to quickly load from cached file
@@ -201,6 +251,10 @@ if __name__ == '__main__':
 					pickle.dump((docs, vocab), cache)
 
 			model_topics(docs, vocab)
+		if e == "sentiment_analysis":
+			sentiment_analysis(cllxn)
+
+
 
 
 
