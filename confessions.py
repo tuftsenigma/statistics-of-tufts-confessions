@@ -34,6 +34,9 @@ DATA TO GET:
 4. daily, monthly trends
 5. correlation between sentiment and likes (?)
 
+
+'mongo ds031651.mongolab.com:31651/tufts_trends -u trends_admin -p jumboni'
+
 """
 
 
