@@ -4,6 +4,7 @@ import	os
 import  requests
 import	datetime
 import	sys
+import	csv
 import 	nltk
 import	json
 import 	gensim
@@ -29,14 +30,31 @@ Scripts used for 'TuftsConfessions' analysis
 
 DATA TO GET:
 1. popular words -- top trigrams vs specific Tufts trigrams x
-2. sentiment score vs frequency vis -- need to actually write sentiment score to db, b/c throttled over time.. redo and label scores accordingly
-3. LDA into good topics and map against popularity - look through different shaped models 2/2 and 2/3 and cherry pick
-4. daily, monthly trends
-5. correlation between sentiment and likes (?)
+2. sentiment score vs frequency vis -- get most popular trigrams per bracket x
+3. LDA into good topics and map against popularity - assign topic to each document based on likelihood (gibbs sampling?) and then count popularity of topics + avg sentiment + visualize
+4. daily, monthly trends - peaks in postage + particular topics / words over time
+5. correlation between sentiment and likes (?) - look at posts that have the most likes and analyze data
+
+QUESTIONS TO ASK:
+1. are positive or negative topics more popular on confessions? (data 1, 2, 3)
+2. what are patterns over time in topics and popularity? data 4
+3. what do people actually like on tufts confessions? is there a pattern? data 5
+
+FUTURE QUESTIONS TO ASK:
+1. what are dichotomies? love vs sex, beautiful vs hot
+2. comparisons between schools
 
 
+Mongo cmds:
+
+connect =
 'mongo ds031651.mongolab.com:31651/tufts_trends -u trends_admin -p jumboni'
 
+query =
+'db.TuftsConfessions.find( { $text : { $search : <text query> }})'
+
+count = 
+'db.TuftsConfessions.count( { $text : { $search : <text query> }})'
 """
 
 
@@ -150,7 +168,7 @@ def popular_trigrams(docs):
 	print "<split text>"
 	trigram_measures = TrigramAssocMeasures()
 	finder = TrigramCollocationFinder.from_words(text)
-	finder.apply_freq_filter(500)
+	finder.apply_freq_filter(2)
 	trigrams = finder.nbest(trigram_measures.pmi, 50)
 	tri_tokens = nltk.trigrams(text)
 
@@ -160,8 +178,89 @@ def popular_trigrams(docs):
 		print "< {}, {}, {} > freq= {}, score={}".format(tri[0], tri[1], tri[2], tri_tokens.count(tri), score)
 	time.sleep(10)
 
+def score_topics(cllxn):
+	"""take topic bins and score them in sentiment and popularity
+
+	PASS 1 : popularity of topic t is {sum over all docs}_proportion of topic words in t over all topic words
+	
+	PASS 2 : Bayesian score... P(w = t|docs) = P(w = t|d1) + ... + P(w = t|dn) --> P(w = t|di) = 
+	P(di | w = t) <probability that we get this document when looking for word w> * 
+	P(w = t) <probability of getting that word in our corpus in general> /
+	P(d) <1/num_docs>
+
+
+	"""
+
+	collection = DB.read(cllxn)
+	posts = collection.find()
+
+	with open("posts/confessions/notes/topic_compilation.tsv") as tsv:
+		topics = csv.reader(tsv, delimiter="\t", quotechar="\"")
+		ts = []
+		for t in topics:
+			ws = t[1].split(",")
+			ts.append(ws)
+
+		topic_pop = [0]*len(ts) # p(topic t)
+		topic_sentiments = [0]*len(ts)
+		D = float(1/float(posts.count())) # 1/P(doc d)
+		T = 1/float(len(ts))
+
+		for post in posts:
+			try:
+				topic_words = [0]*len(ts) # p(t)
+			 	doc = post["message"].encode('utf-8').split()
+			 	doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english") ]
+			 	if len(doc) > 1:
+
+				 	for t, topic in enumerate(ts):
+				 		for word in doc:
+				 			topic_words[t] += topic.count(word)
+				 			T += topic.count(word)
+				 	topic_words = [float(num_topic_words)/float(T) for num_topic_words in topic_words]
+				 	for t,topic_count in enumerate(topic_words):
+						topic_pop[t] += topic_count
+
+			except KeyError:
+				continue
+	print topic_pop
+	print sum(topic_pop)
+
+
+
+
+
+def popular_trigrams_by_sentiment(cllxn):
+	sents = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+	freq = [8, 15, 22, 25, 35, 10, 10, 10, 6]
+	posts = DB.read(cllxn)
+	for i, sent in enumerate(sents):
+		print "< SENT : {} >".format(sent)
+		docs = posts.find({ "sentiment" : sent })
+		if type(docs) == dict:
+			text = [docs["message"]]
+		else:
+			text = []
+			for doc in docs:
+				try:
+					text.append(doc["message"])
+				except KeyError:
+					continue
+			text = re.split("\W+", " ".join(text))
+		print "<split text>"
+		trigram_measures = TrigramAssocMeasures()
+		finder = TrigramCollocationFinder.from_words(text)
+		finder.apply_freq_filter(freq[i])
+		trigrams = finder.nbest(trigram_measures.pmi, 30)
+		tri_tokens = nltk.trigrams(text)
+		print "<printing trigram freqs>"
+		for tri in trigrams:
+			score = finder.score_ngram(trigram_measures.pmi, tri[0], tri[1], tri[2])
+			print "< {}, {}, {} > freq= {}, score={}".format(tri[0], tri[1], tri[2], tri_tokens.count(tri), score)
+
+
 def sentiment_analysis(cllxn):
-	"""plot sentiment analysis on dataset"""
+	"""use text-processing.com API to get sentiment score for each post"""
 	# more_stopwords = ["could", "every", "would", "even", "get", "like", "re", "really", "www", "http", "com", "ve", "1", "watch", "youtube", "https", "tufts", "one", "two", "guy", "girl"]
 
 	confessions = DB.read(cllxn)
@@ -183,16 +282,13 @@ def sentiment_analysis(cllxn):
 				docs.append(doc)
 			except KeyError:
 				continue
-
-	time.sleep(10)
-
+	time.sleep(1)
 	count = 0
 	for doc in docs:
 		count += 1
 		print "analyzed {} documents".format(count)
 		pt = get_sentiment(doc[0])
 		if pt:
-			print pt
 			DB.update(cllxn, {"id" : doc[1]}, { "$set" : { "sentiment" : round(pt, 1) }})
 			data[round(pt, 1)] += 1
 			print DB.find(cllxn, { "id" : doc[1]})
@@ -200,8 +296,6 @@ def sentiment_analysis(cllxn):
 	slogger.info("total words={}".format(len(list(vocab))))
 	slogger.info("total docs={}".format(len(docs)))
 	slogger.info(data)
-
-	print data
 
 
 def get_sentiment(msg):
@@ -213,6 +307,7 @@ def get_sentiment(msg):
 	else:
 		print "error in retrieving sentiment analysis"
 		return ""
+
 
 
 if __name__ == '__main__':
@@ -267,6 +362,10 @@ if __name__ == '__main__':
 
 		if e == "sentiment_analysis":
 			sentiment_analysis(cllxn)
+		if e == "popular_trigrams_by_sentiment":
+			popular_trigrams_by_sentiment(cllxn)
+		if e == "score_topics":
+			score_topics(cllxn)
 
 
 
