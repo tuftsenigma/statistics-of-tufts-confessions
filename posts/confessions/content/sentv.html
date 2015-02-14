@@ -29,31 +29,15 @@
 .d3-tip {
   line-height: 1;
   font-weight: bold;
-  padding: 12px;
+  position: absolute;
+  left: 400px;
+  padding: 5px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
-  border-radius: 2px;
+  border-radius: 10px;
 }
 
-/* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
-}
 
-/* Style northward tooltips differently */
-.d3-tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
-}
 
 </style>
 
@@ -69,9 +53,27 @@ Sentiment analysis for Tufts Confessions
 
 var tip = d3.tip()
   .attr('class', 'd3-tip')
-  .offset([-10, 0])
+  .style("position", "absolute")
+  .offset(function() {
+    return [this.getBBox().height - 100]
+  })
   .html(function(d) {
-    return d["words"];
+
+    var text = "";
+    // make different color of text for each number
+    if (d["score"] < "0.4") {
+      text += "<span style='color:#CD5C5C; display:block; text-align:center;'>" + d["score"] + "</span><br>";
+    } else {
+      text += "<span style='color:#7FFFD4; display:block; text-align:center;'>" + d["score"] + "</span><br>";
+    }
+    text += "'";
+    for (var i = 0, len = d["words"].length; i < len; i++){
+        text += d["words"].charAt(i);
+        if (d["words"].charAt(i) == ",") {
+          text += "'<br>'";
+        }
+    }
+    return text + "'";
   })
 
 
@@ -96,7 +98,7 @@ var xAxis = d3.svg.axis()
 // func for y axis
 var yAxis = d3.svg.axis()
     .scale(y)
-    .orient("left")
+    .orient("left");
 
 // create svg
 var svg = d3.select("#sentv").append("svg")
@@ -126,12 +128,7 @@ d3.tsv("sentiment.tsv", type, function(error, data) {
   // y axis params
   svg.append("g")
       .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end");
+      .call(yAxis);
 
   // graphing data
   svg.selectAll(".bar")
@@ -152,3 +149,9 @@ function type(d) {
 }
 
 </script>
+
+
+
+<p> Sentiment Analysis explained:
+A sentiment score for a word is based on polarity - where the underlying emotion conveyed is negative, positive or neutral. Polarity can be measured using a number of different natural language parsing and machine learning methods; perhaps most commonly (atleast that I've seen) via <href>Naive Bayes classifier</href>. Sentiment analysis is a neat, albeit controversial area of statistical learning - a typical mainstream application would be political opinion mining, of which there's boatloads of papers for an inquisitive pair of spectacles to peruse. 
+  </p>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+</style>
+
+
+<h3>
+Topics in Tufts Confessions
+</h3>
+
+<div id="topicv"></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<script>
+
+
+// size + margin vars
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 500 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// bar width var
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], 0.03);
+
+// func for y size
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+// func for x axis
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("top")
+    .ticks(5);
+
+// func for y axis
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("right")
+    .ticks(5);
+
+// svg
+var svg = d3.select("#topicv").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+// xaxis
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + 0 + "," + height/2 + ")")
+    .call(xAxis);
+
+// yaxis
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + width/2 + ",0)")
+    .call(yAxis);
+
+
+
+</script>
+
+
+

@@ -185,46 +185,68 @@ def score_topics(cllxn):
 	
 	PASS 2 : Bayesian score... P(w = t|docs) = P(w = t|d1) + ... + P(w = t|dn) --> P(w = t|di) = 
 	P(di | w = t) <probability that we get this document when looking for word w> * 
-	P(w = t) <probability of getting that word in our corpus in general> /
+	P(w = t) <probability of getting that word in our corpus in general - word_to_docs[word].> /
 	P(d) <1/num_docs>
-
-
 	"""
+
 
 	collection = DB.read(cllxn)
 	posts = collection.find()
 
 	with open("posts/confessions/notes/topic_compilation.tsv") as tsv:
 		topics = csv.reader(tsv, delimiter="\t", quotechar="\"")
-		ts = []
+		topic_data = []
 		for t in topics:
 			ws = t[1].split(",")
-			ts.append(ws)
+			topic_data.append((t[0], ws))
 
-		topic_pop = [0]*len(ts) # p(topic t)
-		topic_sentiments = [0]*len(ts)
+		topic_pop = [0]*len(topic_data) # p(topic t)
+		topic_sentiments = [0]*len(topic_data)
+		word_to_docs = {}
+
 		D = float(1/float(posts.count())) # 1/P(doc d)
-		T = 1/float(len(ts))
+		T = 1/float(len(topic_data))
 
 		for post in posts:
 			try:
-				topic_words = [0]*len(ts) # p(t)
-			 	doc = post["message"].encode('utf-8').split()
-			 	doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english") ]
-			 	if len(doc) > 1:
-
-				 	for t, topic in enumerate(ts):
-				 		for word in doc:
-				 			topic_words[t] += topic.count(word)
-				 			T += topic.count(word)
-				 	topic_words = [float(num_topic_words)/float(T) for num_topic_words in topic_words]
-				 	for t,topic_count in enumerate(topic_words):
-						topic_pop[t] += topic_count
-
+				doc = post["message"].encode('utf-8').split()
+				doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english")]
+				if len(doc) > 1:
+					for topic in topic_data:
+						for word in topic[1]:
+							try:
+								if (word_to_docs[word] and doc.count(word) > 0):  
+									word_to_docs[word][post["id"]] = doc.count(word)
+							except KeyError:
+								word_to_docs[word] = { post["id"] : doc.count(word) }
 			except KeyError:
 				continue
-	print topic_pop
-	print sum(topic_pop)
+		print word_to_docs		
+
+
+
+
+
+		# for post in posts:
+		# 	try:
+		# 		topic_words = [0]*len(ts) # p(t)
+		# 	 	doc = post["message"].encode('utf-8').split()
+		# 	 	doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english") ]
+		# 	 	if len(doc) > 1:
+
+		# 		 	for t, topic in enumerate(ts):
+		# 		 		for word in doc:
+		# 		 			topic_words[t] += topic[1].count(word)
+		# 		 			T += topic[1].count(word)
+		# 		 	topic_words = [float(num_topic_words)/float(T) for num_topic_words in topic_words]
+		# 		 	for t,topic_count in enumerate(topic_words):
+		# 				topic_pop[t] += topic_count
+
+		# 	except KeyError:
+		# 		continue
+
+		# for t,topic in enumerate(ts):
+		# 	print "{} : {}".format(topic[0], topic_pop[t])
 
 
 
