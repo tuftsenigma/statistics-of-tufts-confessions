@@ -40,10 +40,10 @@
 
 
 <h3>
-Patterns in Popular Topics
+Length vs Sentiment
 </h3>
 
-<div id="topicv"></div>
+<div id="lenv"></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
@@ -51,7 +51,7 @@ Patterns in Popular Topics
 <script>
 
     // vis data
-    d3.json("posts.json", function(json) {
+    d3.json("len.json", function(json) {
         data = json;
         visualize(data);
     });
@@ -69,21 +69,16 @@ Patterns in Popular Topics
             height = 400 - margin.top - margin.bottom;
 
         // scales
-
-        var lFill = d3.scale.linear()
-            .domain([0, d3.max(data, function(d){ return d["len"]})])
-            .range([0.01, 0.1]);
-
-        var cScale = d3.scale.linear()
-            .domain([0, d3.max(data, function(d){ return d["len"]})])
-            .range([1, 30]);
+        var fillScale = d3.scale.linear()
+            .domain([0, 2000])
+            .range([0.0, 0.3]);
 
         var xScale = d3.scale.linear()
             .domain([0.0, 1.0])
             .range([0, width]);
 
         var yScale = d3.scale.linear()
-            .domain([0, 20000])
+            .domain([0, 1700])
             .range([height, 0]);
 
         // func for x axis
@@ -99,7 +94,7 @@ Patterns in Popular Topics
             .ticks(6);
 
         // svg
-        var svg = d3.select("#topicv").append("svg")
+        var svg = d3.select("#lenv").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
           .append("g")
@@ -109,10 +104,10 @@ Patterns in Popular Topics
         svg.selectAll("circle")
         .data(data)
         .enter().append("circle")
-        .attr("cy", function(d) { return yScale(d["topic_popularity"]); })
+        .attr("cy", function(d) { return yScale(d["len"]); })
         .attr("cx", function(d) { return xScale(d["sentiment"]); })
-        .attr("r", function(d) { return cScale(d["len"]); })
-        .attr('fill-opacity', function(d) { return lFill(d["len"])});
+        .attr("r", function(d) { return 12; })
+        .attr('fill-opacity', function(d) { return fillScale(d["len"])});
 
         // xaxis
         svg.append("g")
@@ -137,7 +132,7 @@ Patterns in Popular Topics
             .attr("x", 48 - (height / 2))
             .attr("dy", "1em")
             .style("text-anchor", "middle")
-            .text("Posts");
+            .text("Words");
 
 
     }

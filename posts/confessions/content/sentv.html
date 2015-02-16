@@ -30,7 +30,7 @@
   line-height: 1;
   font-weight: bold;
   position: absolute;
-  left: 400px;
+  left: 350px;
   padding: 5px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
@@ -42,7 +42,7 @@
 </style>
 
 <h3>
-Sentiment analysis for Tufts Confessions
+Language Patterns in Sentiment
 </h3>
 
 <div id="sentv"></div>
@@ -60,11 +60,10 @@ var tip = d3.tip()
   .html(function(d) {
 
     var text = "";
-    // make different color of text for each number
-    if (d["score"] < "0.4") {
-      text += "<span style='color:#CD5C5C; display:block; text-align:center;'>" + d["score"] + "</span><br>";
+    if (d["score"] < "0.5") {
+      text += "<span style='color:#CD5C5C;'>" + d["score"] + "</span><br>";
     } else {
-      text += "<span style='color:#7FFFD4; display:block; text-align:center;'>" + d["score"] + "</span><br>";
+      text += "<span style='color:#7FFFD4;'>" + d["score"] + "</span><br>";
     }
     text += "'";
     for (var i = 0, len = d["words"].length; i < len; i++){
@@ -153,5 +152,5 @@ function type(d) {
 
 
 <p> Sentiment Analysis explained:
-A sentiment score for a word is based on polarity - where the underlying emotion conveyed is negative, positive or neutral. Polarity can be measured using a number of different natural language parsing and machine learning methods; perhaps most commonly (atleast that I've seen) via <href>Naive Bayes classifier</href>. Sentiment analysis is a neat, albeit controversial area of statistical learning - a typical mainstream application would be political opinion mining, of which there's boatloads of papers for an inquisitive pair of spectacles to peruse. 
+A sentiment score for a word is based on polarity - where the underlying emotion conveyed is negative, positive or neutral. Polarity can be measured using a number of different natural language parsing and machine learning methods; perhaps most commonly (atleast that I've seen) via <href>Naive Bayes classifier</href>. In our case, the idea is that reading an individual post generally leaves you somewere on smiley to frowney face spectrum - a confession is the sum of its emotional language, and a sentences' net sentiment is the sum of its weighted word polarities. A typical mainstream application of sentiment analysis would be political opinion mining, of which there's boatloads of papers for an inquisitive pair of spectacles to peruse. 
   </p>

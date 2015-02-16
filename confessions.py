@@ -247,18 +247,46 @@ def score_topics(cllxn):
 	with open("posts/confessions/content/topics.json", "wb") as outfile:
 		json.dump(topic_dumps, outfile, indent=4)
 
-	# post_dumps = []
-	# for topic in topic_to_words.keys():
-	# 	for post in topic_to_posts[topic]:
-	# 		post_dumps.append({
-	# 			"topic" : topic,
-	# 			"topic_popularity" : topic_to_popularity[topic],
-	# 			"sentiment" : post["sentiment"],
-	# 			"id" : post["id"],
-	# 			"len" : post["len"],
-	# 		})
-	# with open("posts/confessions/content/posts.json", "wb") as outfile:
-	# 	json.dump(post_dumps, outfile)
+	post_dumps = []
+	for topic in topic_to_words.keys():
+		for post in topic_to_posts[topic]:
+			post_dumps.append({
+				"topic" : topic,
+				"topic_popularity" : topic_to_popularity[topic],
+				"sentiment" : post["sentiment"],
+				"id" : post["id"],
+				"len" : post["len"],
+			})
+	with open("posts/confessions/content/posts.json", "wb") as outfile:
+		json.dump(post_dumps, outfile)
+
+def len_vs_sentiment(cllxn):
+	"""measure length vs sentiment (also likes)"""
+	collection = DB.read(cllxn)
+	posts = collection.find()
+	post_dumps = []
+
+	for p, post in enumerate(posts):
+		try:
+			print "analyzed {} documents".format(p)
+			doc = post["message"].encode('utf-8').split()
+			doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english")]
+		
+			if len(doc) > 1:
+				# TODO: measure likes
+				post_dumps.append({
+					"id" : post["id"],
+					"len" : len(post["message"].encode('utf-8').split()),
+					"sentiment" : post["sentiment"],
+				})
+		except KeyError:
+			print "error..."
+			continue
+
+	with open("posts/confessions/content/len.json", "wb") as outfile:
+		json.dump(post_dumps, outfile)
+
+
 
 
 def score_topics_summary(cllxn):
@@ -454,6 +482,10 @@ if __name__ == '__main__':
 			popular_trigrams_by_sentiment(cllxn)
 		if e == "score_topics":
 			score_topics(cllxn)
+		if e == "score_topics_summary":
+			score_topics_summary(cllxn)
+		if e == "len_vs_sentiment":
+			len_vs_sentiment(cllxn)
 
 
 
