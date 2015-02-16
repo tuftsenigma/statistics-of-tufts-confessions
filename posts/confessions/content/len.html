@@ -52,6 +52,7 @@ Length vs Sentiment
 
     // vis data
     d3.json("len.json", function(json) {
+        // TODO: prune outliers + insert text with average len above each bracket
         data = json;
         visualize(data);
     });
@@ -70,15 +71,15 @@ Length vs Sentiment
 
         // scales
         var fillScale = d3.scale.linear()
-            .domain([0, 2000])
-            .range([0.0, 0.3]);
+            .domain([0, 1000])
+            .range([0.0, 0.15]);
 
         var xScale = d3.scale.linear()
             .domain([0.0, 1.0])
             .range([0, width]);
 
         var yScale = d3.scale.linear()
-            .domain([0, 1700])
+            .domain([0, 1000])
             .range([height, 0]);
 
         // func for x axis
@@ -107,7 +108,8 @@ Length vs Sentiment
         .attr("cy", function(d) { return yScale(d["len"]); })
         .attr("cx", function(d) { return xScale(d["sentiment"]); })
         .attr("r", function(d) { return 12; })
-        .attr('fill-opacity', function(d) { return fillScale(d["len"])});
+        .attr('fill-opacity', function(d) { return fillScale(d["len"])})
+        .attr('fill', "#FF0000 ");
 
         // xaxis
         svg.append("g")
