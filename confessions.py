@@ -29,11 +29,12 @@ from 	matplotlib			import pyplot as plt
 Scripts used for 'TuftsConfessions' analysis
 
 DATA TO GET:
-1. popular words -- top trigrams vs specific Tufts trigrams x
-2. sentiment score vs frequency vis -- get most popular trigrams per bracket x
-3. LDA into good topics and map against popularity - assign topic to each document based on likelihood (gibbs sampling?) and then count popularity of topics + avg sentiment + visualize
-4. daily, monthly trends - peaks in postage + particular topics / words over time
-5. correlation between sentiment and likes (?) - look at posts that have the most likes and analyze data
+1. popular words - top trigrams vs specific Tufts trigrams x
+2. sentiment score vs frequency vis - get most popular trigrams per bracket x
+3. LDA into good topics and map against popularity - x NO PATTERN
+4. overlaps between topics - directed graph of conditional distributions
+5. weekly, monthly, yearly trends - peaks in postage + particular topics / words over time
+6. correlation between sentiment and likes (?) - look at posts that have the most likes and analyze data
 
 QUESTIONS TO ASK:
 1. are positive or negative topics more popular on confessions? (data 1, 2, 3)
@@ -178,17 +179,92 @@ def popular_trigrams(docs):
 		print "< {}, {}, {} > freq= {}, score={}".format(tri[0], tri[1], tri[2], tri_tokens.count(tri), score)
 	time.sleep(10)
 
+
 def score_topics(cllxn):
 	"""take topic bins and score them in sentiment and popularity
-
-	PASS 1 : popularity of topic t is {sum over all docs}_proportion of topic words in t over all topic words
-	
-	PASS 2 : Bayesian score... P(w = t|docs) = P(w = t|d1) + ... + P(w = t|dn) --> P(w = t|di) = 
-	P(di | w = t) <probability that we get this document when looking for word w> * 
-	P(w = t) <probability of getting that word in our corpus in general - word_to_docs[word].> /
-	P(d) <1/num_docs>
+	-- method by averaging sentiments over all occurrences of topic words
 	"""
 
+	collection = DB.read(cllxn)
+	posts = collection.find()
+
+	with open("posts/confessions/notes/topic_compilation.tsv") as tsv:
+		topics = csv.reader(tsv, delimiter="\t", quotechar="\"")
+		topic_to_words = {}
+		topic_to_posts = {}
+		topic_to_popularity = {} 
+
+		for t in topics:
+			ws = t[1].split(",")
+			topic_to_words[t[0]] = ws
+			topic_to_posts[t[0]] = []
+			topic_to_popularity[t[0]] = 0
+
+	for p, post in enumerate(posts):
+		try:
+			print "analyzed {} documents".format(p)
+			doc = post["message"].encode('utf-8').split()
+			doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english")]
+		
+			if len(doc) > 1:
+				topic_word_counts = {}
+				for topic in topic_to_words.keys():
+					is_about = False
+					for word in topic_to_words[topic]:
+						try:
+							topic_word_counts[topic] += doc.count(word)
+						except KeyError:
+							topic_word_counts[topic] = doc.count(word)
+						finally:
+							if doc.count(word) > 0:
+								is_about = True
+					if is_about:
+						topic_to_popularity[topic] += 1
+
+				total = sum(topic_word_counts.values())
+				for topic in topic_to_words.keys():	
+					if topic_word_counts[topic] >= 2:
+						prob = float(topic_word_counts[topic]) / float(total)
+						topic_to_posts[topic].append({
+							"id" : post["id"],
+							"prob" : prob,
+							"len" : len(doc),
+							"sentiment" : post["sentiment"]
+						})
+
+		except KeyError:
+			print "error..."
+			continue
+
+	topic_dumps = []
+	for topic in topic_to_words.keys():
+		topic_dumps.append({
+			"topic" : topic,
+			"words" : topic_to_words[topic],
+			"popularity" : float(topic_to_popularity[topic]) / float(sum(topic_to_popularity.values())),
+			"count" : topic_to_popularity[topic]
+		})
+	with open("posts/confessions/content/topics.json", "wb") as outfile:
+		json.dump(topic_dumps, outfile, indent=4)
+
+	# post_dumps = []
+	# for topic in topic_to_words.keys():
+	# 	for post in topic_to_posts[topic]:
+	# 		post_dumps.append({
+	# 			"topic" : topic,
+	# 			"topic_popularity" : topic_to_popularity[topic],
+	# 			"sentiment" : post["sentiment"],
+	# 			"id" : post["id"],
+	# 			"len" : post["len"],
+	# 		})
+	# with open("posts/confessions/content/posts.json", "wb") as outfile:
+	# 	json.dump(post_dumps, outfile)
+
+
+def score_topics_summary(cllxn):
+	"""take topic bins and score them in sentiment and popularity
+	-- method by averaging sentiments over all occurrences of topic words
+	"""
 
 	collection = DB.read(cllxn)
 	posts = collection.find()
@@ -196,59 +272,49 @@ def score_topics(cllxn):
 	with open("posts/confessions/notes/topic_compilation.tsv") as tsv:
 		topics = csv.reader(tsv, delimiter="\t", quotechar="\"")
 		topic_data = []
+		topic_pop = {} # p(topic t|docs) = p(topic t|d1) + ... p(topic t|dn)
+		topic_sentiments = {}
 		for t in topics:
 			ws = t[1].split(",")
 			topic_data.append((t[0], ws))
+			topic_pop[t[0]] = 0
+			topic_sentiments[t[0]] = []
 
-		topic_pop = [0]*len(topic_data) # p(topic t)
-		topic_sentiments = [0]*len(topic_data)
-		word_to_docs = {}
+		doc_to_topic = {} # doc_to_topic[doc_id][topic_name] == <count of words associated w/topic>
 
-		D = float(1/float(posts.count())) # 1/P(doc d)
-		T = 1/float(len(topic_data))
+		D = 0 # eventually build to 1/P(doc d)
 
-		for post in posts:
+		for p, post in enumerate(posts):
 			try:
+				print "analyzed {} documents".format(p)
 				doc = post["message"].encode('utf-8').split()
 				doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english")]
+				doc_to_topic[post["id"]] = {}
 				if len(doc) > 1:
 					for topic in topic_data:
 						for word in topic[1]:
 							try:
-								if (word_to_docs[word] and doc.count(word) > 0):  
-									word_to_docs[word][post["id"]] = doc.count(word)
+								doc_to_topic[post["id"]][topic[0]] += doc.count(word)
+								for d in xrange(doc.count(word)):
+									topic_sentiments[topic[0]].append(float(post["sentiment"]))
 							except KeyError:
-								word_to_docs[word] = { post["id"] : doc.count(word) }
+								doc_to_topic[post["id"]][topic[0]] = doc.count(word)
+						topic_pop[topic[0]] += doc_to_topic[post["id"]][topic[0]]
+				if sum(doc_to_topic[post["id"]].values()) > 0:
+					D += 1
 			except KeyError:
-				continue
-		print word_to_docs		
+				print "error..."
+				continue	
 
-
-
-
-
-		# for post in posts:
-		# 	try:
-		# 		topic_words = [0]*len(ts) # p(t)
-		# 	 	doc = post["message"].encode('utf-8').split()
-		# 	 	doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english") ]
-		# 	 	if len(doc) > 1:
-
-		# 		 	for t, topic in enumerate(ts):
-		# 		 		for word in doc:
-		# 		 			topic_words[t] += topic[1].count(word)
-		# 		 			T += topic[1].count(word)
-		# 		 	topic_words = [float(num_topic_words)/float(T) for num_topic_words in topic_words]
-		# 		 	for t,topic_count in enumerate(topic_words):
-		# 				topic_pop[t] += topic_count
-
-		# 	except KeyError:
-		# 		continue
-
-		# for t,topic in enumerate(ts):
-		# 	print "{} : {}".format(topic[0], topic_pop[t])
-
-
+		D = float(1)/float(D)
+		print "docs with relevant topics: {}".format(D)
+		print topic_pop
+		T = sum(topic_pop.values())
+		for topic in topic_data:
+			topic_pop[topic[0]] = float(topic_pop[topic[0]]) / float(T)
+			topic_sentiments[topic[0]] = sum(topic_sentiments[topic[0]]) / float(len(topic_sentiments[topic[0]]))
+			print "{} : {} <{}>".format(topic[0], topic_pop[topic[0]], topic_sentiments[topic[0]])
+		print "total probability: {}".format(sum(topic_pop.values()))
 
 
 
