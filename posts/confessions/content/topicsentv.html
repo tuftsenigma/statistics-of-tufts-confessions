@@ -40,10 +40,10 @@
 
 
 <h3>
-Length vs Sentiment
+Patterns in Popular Topics
 </h3>
 
-<div id="lenv"></div>
+<div id="topicsentv"></div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
@@ -51,8 +51,7 @@ Length vs Sentiment
 <script>
 
     // vis data
-    d3.json("len.json", function(json) {
-        // TODO: prune outliers + insert text with average len above each bracket
+    d3.json("posts.json", function(json) {
         data = json;
         visualize(data);
     });
@@ -70,16 +69,21 @@ Length vs Sentiment
             height = 400 - margin.top - margin.bottom;
 
         // scales
-        var fillScale = d3.scale.linear()
-            .domain([0, 800])
-            .range([0.0, 0.15]);
+
+        var lFill = d3.scale.linear()
+            .domain([0, d3.max(data, function(d){ return d["len"]})])
+            .range([0.01, 0.1]);
+
+        var cScale = d3.scale.linear()
+            .domain([0, d3.max(data, function(d){ return d["len"]})])
+            .range([1, 30]);
 
         var xScale = d3.scale.linear()
             .domain([0.0, 1.0])
             .range([0, width]);
 
         var yScale = d3.scale.linear()
-            .domain([0, 800])
+            .domain([0, 20000])
             .range([height, 0]);
 
         // func for x axis
@@ -95,7 +99,7 @@ Length vs Sentiment
             .ticks(6);
 
         // svg
-        var svg = d3.select("#lenv").append("svg")
+        var svg = d3.select("#topicsentv").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
           .append("g")
@@ -105,11 +109,10 @@ Length vs Sentiment
         svg.selectAll("circle")
         .data(data)
         .enter().append("circle")
-        .attr("cy", function(d) { return yScale(d["len"]); })
+        .attr("cy", function(d) { return yScale(d["topic_popularity"]); })
         .attr("cx", function(d) { return xScale(d["sentiment"]); })
-        .attr("r", function(d) { return 12; })
-        .attr('fill-opacity', function(d) { return fillScale(d["len"])})
-        .attr('fill', "#FF0000 ");
+        .attr("r", function(d) { return cScale(d["len"]); })
+        .attr('fill-opacity', function(d) { return lFill(d["len"])});
 
         // xaxis
         svg.append("g")
@@ -134,7 +137,7 @@ Length vs Sentiment
             .attr("x", 48 - (height / 2))
             .attr("dy", "1em")
             .style("text-anchor", "middle")
-            .text("Number of words in post");
+            .text("Posts");
 
 
     }

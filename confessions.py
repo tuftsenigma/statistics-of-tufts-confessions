@@ -31,15 +31,18 @@ Scripts used for 'TuftsConfessions' analysis
 DATA TO GET:
 1. popular words - top trigrams vs specific Tufts trigrams x
 2. sentiment score vs frequency vis - get most popular trigrams per bracket x
-3. LDA into good topics and map against popularity - x NO PATTERN
-4. overlaps between topics - directed graph of conditional distributions
-5. weekly, monthly, yearly trends - peaks in postage + particular topics / words over time
-6. correlation between sentiment and likes (?) - look at posts that have the most likes and analyze data
+3. LDA into good topics and map against popularity vs sentiment - x NO PATTERN
+4. bubble visualization of topics w/words and populatiries 
+5. how sentiment changes over a really long post
+6. overlaps between topics - directed graph of conditional distributions
+7. weekly, monthly, yearly trends - peaks in postage + particular topics / words over time
+8. correlation between sentiment and likes (?) - look at posts that have the most likes and analyze data
 
-QUESTIONS TO ASK:
-1. are positive or negative topics more popular on confessions? (data 1, 2, 3)
-2. what are patterns over time in topics and popularity? data 4
-3. what do people actually like on tufts confessions? is there a pattern? data 5
+INSIGHTS / QUESTIONS:
+1. Tufts Confessions... sums us up pretty well
+2. Our Confessions are depressing and it has to do with place
+3. what are patterns over time in topics and popularity? data 4
+4. what do people actually like on tufts confessions? is there a pattern? data 5
 
 FUTURE QUESTIONS TO ASK:
 1. what are dichotomies? love vs sex, beautiful vs hot
@@ -247,24 +250,37 @@ def score_topics(cllxn):
 	with open("posts/confessions/content/topics.json", "wb") as outfile:
 		json.dump(topic_dumps, outfile, indent=4)
 
-	post_dumps = []
-	for topic in topic_to_words.keys():
-		for post in topic_to_posts[topic]:
-			post_dumps.append({
-				"topic" : topic,
-				"topic_popularity" : topic_to_popularity[topic],
-				"sentiment" : post["sentiment"],
-				"id" : post["id"],
-				"len" : post["len"],
-			})
-	with open("posts/confessions/content/posts.json", "wb") as outfile:
-		json.dump(post_dumps, outfile)
+	# post_dumps = []
+	# for topic in topic_to_words.keys():
+	# 	for post in topic_to_posts[topic]:
+	# 		post_dumps.append({
+	# 			"topic" : topic,
+	# 			"topic_popularity" : topic_to_popularity[topic],
+	# 			"sentiment" : post["sentiment"],
+	# 			"id" : post["id"],
+	# 			"len" : post["len"],
+	# 		})
+	# with open("posts/confessions/content/posts.json", "wb") as outfile:
+	# 	json.dump(post_dumps, outfile)
 
 def len_vs_sentiment(cllxn):
 	"""measure length vs sentiment (also likes)"""
 	collection = DB.read(cllxn)
 	posts = collection.find()
 	post_dumps = []
+	# threshold determined after analysis.. just hardcoded here
+	threshold = {
+		0.1 : 500,
+		0.2 : 600,
+		0.3 : 700,
+		0.4 : 800,
+		0.5 : 800,
+		0.6 : 600,
+		0.7 : 500,
+		0.8 : 500,
+		0.9 : 400
+	}
+	pruned = 0
 
 	for p, post in enumerate(posts):
 		try:
@@ -274,15 +290,19 @@ def len_vs_sentiment(cllxn):
 		
 			if len(doc) > 1:
 				# TODO: measure likes
-				post_dumps.append({
-					"id" : post["id"],
-					"len" : len(post["message"].encode('utf-8').split()),
-					"sentiment" : post["sentiment"],
-				})
+				if len(post["message"].encode('utf-8').split()) < threshold[post["sentiment"]]:
+					post_dumps.append({
+						"id" : post["id"],
+						"len" : len(post["message"].encode('utf-8').split()),
+						"sentiment" : post["sentiment"],
+					})
+				else:
+					pruned += 1
 		except KeyError:
 			print "error..."
 			continue
 
+	print "pruned {} outlier posts that were above the threshold for their sentiment".format(pruned)
 	with open("posts/confessions/content/len.json", "wb") as outfile:
 		json.dump(post_dumps, outfile)
 
