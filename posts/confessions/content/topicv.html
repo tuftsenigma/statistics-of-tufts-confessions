@@ -6,6 +6,40 @@ text {
   font: 10px sans-serif;
 }
 
+/* used for words for topics html box */
+appendix {
+    font: 12px sans-serif;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
 </style>
 <body>
 
@@ -14,9 +48,12 @@ text {
 Topics in Tufts Confessions
 </h3>
 
-<div id="topicv"></div>
+<div id="topicv">
+</div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 <script>
+
 
 var width = 700,
     height = 500,
@@ -29,14 +66,13 @@ var svg = d3.select("body").append("svg")
     .append("g")
         .attr("transform", "translate(50,50)");
 
+
 var pack = d3.layout.pack()
     .size([width, height - 50])
     .padding(5);
 
 d3.json("topictree.json", function(data) {
   var nodes = pack.nodes(data);
-  console.log(nodes);
-
   var node = svg.selectAll(".node")
       .data(nodes)
       .enter()
@@ -47,10 +83,41 @@ d3.json("topictree.json", function(data) {
   node.append("circle")
       .attr("r", function(d) { return d.r; })
       .attr("fill", function(d) { return d.children ? "#fff" : "steelblue"})
-      .attr("opacity", 0.45)
+      .attr("opacity", 0.5)
       .attr("stroke", function(d) { return d.children ? "#fff" : "black"})
-      .attr("stroke-width", "2");
+      .attr("stroke-width", "0")
+      .on("mouseover", mouseOver)
+      .on("mouseout", mouseOut);
 
+  // appendix for selected topic words
+  appendix = { x: 410, y: 50, width: 150, height: 270 };
+  var appendix_box =svg.append("rect")
+    .attr("x", appendix.x)
+    .attr("y", appendix.y)
+    .attr("width", appendix.width)
+    .attr("height", appendix.height)
+    .attr("opacity", 0.65)
+    .attr("rx", "10px");
+
+  var title = svg.append("text")
+    .attr("x", appendix.x+37)
+    .attr("y", appendix.y +20)
+    .attr("fill", "#C80000")
+    .attr("opacity", 0.0)
+    .text("Popular Words:");
+
+  var words_appendix = svg.append("foreignObject")
+      .attr("width", appendix.x + 90)
+      .attr("height", appendix.y + 300)
+    .append("xhtml:body")
+      .style("position", "absolute")
+      .style("left", "510px")
+      .style("top", "180px")
+      .style("color", "white")
+      .style("font", "sans-serif");
+
+
+  // topic text
   node.append("text")
       .text(function(d) {
         var text = "";
@@ -71,8 +138,75 @@ d3.json("topictree.json", function(data) {
         }
         return size;
       })
-      .attr('padding', '2px;');
-  });
+      .attr('padding', '2px;')
+      .attr("pointer-events", "none");
+
+  // popularity stat text
+  node.append("text")
+      .text(function(d) {
+        text = "" + d["popularity"];
+        text = text.substring(2,4);
+        if (text.charAt(0) == 0) {
+          text = text.substring(1,4);
+        }
+        return text + "%";
+      })
+      .attr("text-anchor", "middle")
+      .style("fill", "white")
+      .style("font-size", function(d){
+        size = 15 - (d.name.length/2)
+        if (d.value > 4000) {
+          size += d.value/600;
+        }
+        return size;
+      })
+      .attr("y", function(d){
+        size = 15 - (d.name.length/2)
+        if (d.value > 4000) {
+          size += d.value/600;
+        }
+        return size;     
+
+      })
+      .style("text-align", "center")
+      .attr("pointer-events", "none");
+
+
+  // provides node animation for mouseover
+    function mouseOver() {
+        d3.select(this).transition()
+            .duration(300)
+            .attr("r", function(d){ 
+              // transition word appendix box in as side effect
+            words_appendix.attr("opacity", 0.0);  
+            if (d.name != "topics"){
+              text = ""
+              for (var i = 0, len = d["words"].length; i < len; i++) {
+                text += d["words"][i] + "<br>";
+                words_appendix.html(text);  
+                title.attr("opacity", 1.0);
+                appendix_box.attr("opacity", 0.75);
+              }
+            }
+            words_appendix.attr("opacity", 1.0);
+            return d.r + 3 })
+            .attr("opacity", 0.9);
+    };
+
+    function mouseOut() {
+        d3.select(this).transition()
+            .duration(300)
+            .attr("r", function(d) { 
+              // transition word appendix box out as side effect
+              words_appendix.html( "" );
+              return d.r })
+            .attr("opacity", 0.45);
+    };
+
+
+
+});
+
 
 
 </script>
