@@ -12,32 +12,14 @@ appendix {
 }
 
 .d3-tip {
+  font: 15px sans-serif;
   line-height: 1;
   font-weight: bold;
-  padding: 12px;
+  position: absolute;
+  padding: 15px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
-  border-radius: 2px;
-}
-
-/* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
-  box-sizing: border-box;
-  display: inline;
-  font-size: 10px;
-  width: 100%;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.8);
-  content: "\25BC";
-  position: absolute;
-  text-align: center;
-}
-
-/* Style northward tooltips differently */
-.d3-tip.n:after {
-  margin: -1px 0 0 0;
-  top: 100%;
-  left: 0;
+  border-radius: 20px;
 }
 
 </style>
@@ -60,11 +42,32 @@ var width = 700,
     xshift = -150,
     yshift = -50;
 
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .style("position", "absolute")
+  .offset(function() {
+    return [this.getBBox().height - 100, this.getBBox().width - 100];
+  })
+  .html(function(d) {
+      if (!d.children) {
+        text = "<span style='color:#C80000'>Popular words</span><br><br>";
+        for (var i = 0, len = d["words"].length; i < len; i++) {
+          text += d["words"][i] + "<br>";
+        }
+        return text;
+      } else { 
+        return ""; 
+      }
+  });
+
+
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height)
     .append("g")
-        .attr("transform", "translate(50,50)");
+        .attr("transform", "translate(50,50)")
+    .call(tip);
 
 
 var pack = d3.layout.pack()
@@ -87,47 +90,25 @@ d3.json("topictree.json", function(data) {
       .attr("stroke", function(d) { return d.children ? "#fff" : "black"})
       .attr("stroke-width", "0")
       .on("mouseover", mouseOver)
-      .on("mouseout", mouseOut);
-
-  // appendix for selected topic words
-  appendix = { x: 410, y: 50, width: 150, height: 270 };
-  var appendix_box =svg.append("rect")
-    .attr("x", appendix.x)
-    .attr("y", appendix.y)
-    .attr("width", appendix.width)
-    .attr("height", appendix.height)
-    .attr("opacity", 0.65)
-    .attr("rx", "10px");
-
-  var title = svg.append("text")
-    .attr("x", appendix.x+37)
-    .attr("y", appendix.y +20)
-    .attr("fill", "#C80000")
-    .attr("opacity", 0.0)
-    .text("Popular Words:");
-
-  var words_appendix = svg.append("foreignObject")
-      .attr("width", appendix.x + 90)
-      .attr("height", appendix.y + 300)
-    .append("xhtml:body")
-      .style("position", "absolute")
-      .style("left", "510px")
-      .style("top", "180px")
-      .style("color", "white")
-      .style("font", "sans-serif");
-
+      .on("mouseover.tooltip", tip.show)
+      .on("mouseout", mouseOut)
+      .on("mouseout.tooltip", tip.hide);
 
   // topic text
   node.append("text")
       .text(function(d) {
-        var text = "";
-        for (var i = 0, len = d["name"].length; i < len; i++) {
-          text += d["name"].charAt(i);
-          if (d["name"].charAt(i) == " ") {
-            text += "\n";
+        if (!d.children) {
+          var text = "";
+          for (var i = 0, len = d["name"].length; i < len; i++) {
+            text += d["name"].charAt(i);
+            if (d["name"].charAt(i) == " ") {
+              text += "\n";
+            }
           }
+          return text;
+        } else {
+          return "";
         }
-        return text;
       })
       .attr("text-anchor", "middle")
       .style("fill", "white")
@@ -144,12 +125,16 @@ d3.json("topictree.json", function(data) {
   // popularity stat text
   node.append("text")
       .text(function(d) {
-        text = "" + d["popularity"];
-        text = text.substring(2,4);
-        if (text.charAt(0) == 0) {
-          text = text.substring(1,4);
+        if (!d.children) {
+          text = "" + d["popularity"];
+          text = text.substring(2,4);
+          if (text.charAt(0) == 0) {
+            text = text.substring(1,4);
+          }
+          return text + "%";
+        } else {
+          return "";
         }
-        return text + "%";
       })
       .attr("text-anchor", "middle")
       .style("fill", "white")
@@ -177,19 +162,8 @@ d3.json("topictree.json", function(data) {
         d3.select(this).transition()
             .duration(300)
             .attr("r", function(d){ 
-              // transition word appendix box in as side effect
-            words_appendix.attr("opacity", 0.0);  
-            if (d.name != "topics"){
-              text = ""
-              for (var i = 0, len = d["words"].length; i < len; i++) {
-                text += d["words"][i] + "<br>";
-                words_appendix.html(text);  
-                title.attr("opacity", 1.0);
-                appendix_box.attr("opacity", 0.75);
-              }
-            }
-            words_appendix.attr("opacity", 1.0);
-            return d.r + 3 })
+              return d.r + 3;
+            })
             .attr("opacity", 0.9);
     };
 
@@ -197,9 +171,8 @@ d3.json("topictree.json", function(data) {
         d3.select(this).transition()
             .duration(300)
             .attr("r", function(d) { 
-              // transition word appendix box out as side effect
-              words_appendix.html( "" );
-              return d.r })
+              return d.r;
+            })
             .attr("opacity", 0.45);
     };
 
