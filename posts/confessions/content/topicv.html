@@ -14,8 +14,9 @@ appendix {
 .d3-tip {
   font: 15px sans-serif;
   line-height: 1;
+  visibility: visible;
   font-weight: bold;
-  left: 500px;
+  left: 100px;
   position: fixed;
   padding: 15px;
   background: rgba(0, 0, 0, 0.8);
@@ -53,6 +54,7 @@ appendix {
 Topics in Tufts Confessions
 </h3>
 
+<body>
 <div id="topicv">
 </div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -149,7 +151,7 @@ Topics in Tufts Confessions
 
 var width = 700,
     height = 500,
-    xshift = -150,
+    xshift = -180,
     yshift = -50;
 
 
@@ -158,16 +160,19 @@ var tip = d3.tip()
   .style("position", "absolute")
   .offset(function(d) {
     console.log(d);
-    return [200,150]
+    return [300 - d.y,650 - d.x]
   })
   .html(function(d) {
       if (!d.children) {
+        tip.style("visibility", "visible");
         text = "<span style='color:#C80000'>Popular words</span><br><br>";
         for (var i = 0, len = d["words"].length; i < len; i++) {
           text += d["words"][i] + "<br>";
         }
         return text;
-      } else { 
+      } else {
+        // hide
+        tip.style("visibility", "hidden");
         return ""; 
       }
   });
@@ -204,6 +209,15 @@ var pack = d3.layout.pack()
       .style("text-align", "center")
       .attr("pointer-events", "none");
 
+  // var tooltip = d3.select("body")
+  //   .append("div")
+  //   .style("position", "absolute")
+  //   .style("z-index", "10")
+  //   .style("visibility", "hidden")
+  //   .text(function(d){
+  //     return "yo";
+  //   });
+
 
   var nodes = pack.nodes(data);
   var node = svg.selectAll(".node")
@@ -223,6 +237,7 @@ var pack = d3.layout.pack()
       .on("mouseover.tooltip", tip.show)
       .on("mouseout", mouseOut)
       .on("mouseout.tooltip", tip.hide);
+
 
   // topic text
   node.append("text")
