@@ -15,12 +15,35 @@ appendix {
   font: 15px sans-serif;
   line-height: 1;
   font-weight: bold;
-  position: absolute;
+  left: 500px;
+  position: fixed;
   padding: 15px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
   border-radius: 20px;
 }
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  right: 100px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.9);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
 
 </style>
 <body>
@@ -37,6 +60,93 @@ Topics in Tufts Confessions
 <script>
 
 
+// var width = 700,
+//     height = 900,
+//     xshift = -150,
+//     yshift = -50;
+
+
+// var tip = d3.tip()
+//   .attr('class', 'd3-tip')
+//   .style("position", "absolute")
+//   .offset(function(d) {
+//     console.log(d);
+//     return [200,200]
+//   })
+//   .html(function(d) {
+//       if (!d.children) {
+//         text = "<span style='color:#C80000'>Popular words</span><br><br>";
+//         for (var i = 0, len = d["words"].length; i < len; i++) {
+//           text += d["words"][i] + "<br>";
+//         }
+//         return text;
+//       } else { 
+//         return ""; 
+//       }
+//   });
+
+
+// var svg = d3.select("body").append("svg")
+//     .attr("width", width)
+//     .attr("height", height)
+//     .append("g")
+//         .attr("transform", "translate(50,50)")
+//     .call(tip);
+
+
+
+// d3.json("topics.json", function(data) {
+//   // scale
+//   var xScale = d3.scale.linear()
+//       .domain([0, d3.max(data, function(d) { return d["count"];})])
+//       .range([0, 500]);
+
+//   var rScale = d3.scale.linear()
+//       .domain([0, d3.max(data, function(d) { return d["count"];})])
+//       .range([0, 100]);
+
+
+
+//   // hardcode relative positions
+//   var pos = [0]
+//   for (var i = 1; i < data.length; i++) {
+//     pos.push(rScale(data[i].count)*1.4 + pos[i - 1]);
+//   }
+//   var circle = svg.append("g")
+//     .attr("class", "nodes")
+//   .selectAll("circle")
+//       .data(data).enter()
+//         .append("circle")
+//           .attr("fill", "steelblue")
+//           .attr("cy", function(d,i) { 
+//             return pos[i] - 30
+//           })
+//           .attr("cx", function(d, i) { return 90})
+//           .attr("r", function(d) { return rScale(d["count"]); })
+//           .on("mouseover", mouseOver)
+//           .on("mouseover.tooltip", tip.show)
+//           .on("mouseout", mouseOut)
+//           .on("mouseout.tooltip", tip.hide);
+
+//   // provides node animation for mouseover
+//     function mouseOver() {
+//         d3.select(this).transition()
+//             .duration(300)
+//             .attr("r", function(d) { return rScale(d["count"]) + 10; })
+//     };
+
+//     function mouseOut() {
+//         d3.select(this).transition()
+//             .duration(300)
+//             .attr("r", function(d) { return rScale(d["count"]); });
+//     };
+
+
+
+// });
+
+// WAY 2
+
 var width = 700,
     height = 500,
     xshift = -150,
@@ -46,8 +156,9 @@ var width = 700,
 var tip = d3.tip()
   .attr('class', 'd3-tip')
   .style("position", "absolute")
-  .offset(function() {
-    return [this.getBBox().height - 100, this.getBBox().width - 100];
+  .offset(function(d) {
+    console.log(d);
+    return [200,150]
   })
   .html(function(d) {
       if (!d.children) {
@@ -70,11 +181,30 @@ var svg = d3.select("body").append("svg")
     .call(tip);
 
 
+
+d3.json("topictree.json", function(data) {
 var pack = d3.layout.pack()
     .size([width, height - 50])
     .padding(5);
 
-d3.json("topictree.json", function(data) {
+
+  var text = svg.append("g")
+    .attr("class", "labels")
+  .selectAll("text")
+    .data(data).enter()
+      .append("text")
+        .text(function(d) {
+          return d.topic;
+        })
+      .attr("text-anchor", "middle")
+      .style("fill", "black")
+      .attr("dx", function(d, i) { return d.topic.length*15; })
+      .attr("dy", 60)
+      .style("font-size", "15px")
+      .style("text-align", "center")
+      .attr("pointer-events", "none");
+
+
   var nodes = pack.nodes(data);
   var node = svg.selectAll(".node")
       .data(nodes)
@@ -86,7 +216,7 @@ d3.json("topictree.json", function(data) {
   node.append("circle")
       .attr("r", function(d) { return d.r; })
       .attr("fill", function(d) { return d.children ? "#fff" : "steelblue"})
-      .attr("opacity", 0.5)
+      .attr("opacity", 1.0)
       .attr("stroke", function(d) { return d.children ? "#fff" : "black"})
       .attr("stroke-width", "0")
       .on("mouseover", mouseOver)
@@ -161,24 +291,19 @@ d3.json("topictree.json", function(data) {
     function mouseOver() {
         d3.select(this).transition()
             .duration(300)
-            .attr("r", function(d){ 
-              return d.r + 3;
-            })
-            .attr("opacity", 0.9);
+            .attr("opacity", 0.6);
     };
 
     function mouseOut() {
         d3.select(this).transition()
             .duration(300)
-            .attr("r", function(d) { 
-              return d.r;
-            })
-            .attr("opacity", 0.45);
+            .attr("opacity", 1.0);
+
     };
 
-
-
 });
+
+
 
 
 
