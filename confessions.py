@@ -39,6 +39,7 @@ DATA TO GET:
 8. correlation between sentiment and likes (?) - look at posts that have the most likes and analyze data
 
 INSIGHTS / QUESTIONS:
+0. Language patterns in confessions
 1. Tufts Confessions... sums us up pretty well
 2. Our Confessions are depressing and it has to do with place
 3. what are patterns over time in topics and popularity? data 4
@@ -166,6 +167,70 @@ def popular_bigrams(docs):
 	time.sleep(10)
 
 
+def temporal_stats(docs):
+	daily_counts = {}
+	monthly_counts = {}
+	collection = DB.read(cllxn)
+	posts = collection.find()
+	for post in posts:
+		try:
+			date = post["created_time"][0:10]
+			try:
+				daily_counts[date] += 1
+			except KeyError:
+				daily_counts[date] = 0
+			try:
+				print date[0:7]
+				monthly_counts[date[0:7]] += 1
+			except KeyError:
+				monthly_counts[date[0:7]] = 0
+		except KeyError:
+			continue
+	print "AVG PER DAY:"
+	print (float(sum(daily_counts.values())) / float(len(daily_counts.keys())))
+
+	print "AVG PER MONTH:"
+	print (float(sum(monthly_counts.values())) / float(len(monthly_counts.keys())))
+
+
+def topic_markov(docs):
+	'''
+	created a directed acyclic graph of topics (markov chain)'''
+	collection = DB.read(cllxn)
+	posts = collection.find()
+
+	with open("posts/confessions/notes/topic_compilation.tsv") as tsv:
+		topics = csv.reader(tsv, delimiter="\t", quotechar="\"")
+		topic_to_words = {}
+		topic_to_topic = {}
+		word_to_topics = {}
+
+		for t in topics:
+			ws = t[1].split(",")
+			topic_to_words[t[0]] = ws
+			for t2 in topics:
+				topic_to_topic[t[0]][t2[0]] = 0
+			for w in ws:
+				word_to_topics[w] = t[0]
+
+
+		for post in posts: # jesus... O(n^2)
+			doc = post["message"].encode('utf-8').split()
+			doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english")]
+			for i in xrange(len(doc)):
+				try:
+					from_topic = word_to_topics[doc[i]]
+					for j in xrange(i, len(doc)):
+						try:
+							to_topic = word_to_topics[doc[j]]
+							topic_to_topic[from_topic][to_topic] += 1
+						except KeyError:
+							continue
+				except KeyError:
+					continue
+
+
+
 def popular_trigrams(docs):
 	text = re.split("\W+", " ".join(docs))
 
@@ -185,7 +250,8 @@ def popular_trigrams(docs):
 
 def score_topics(cllxn):
 	"""take topic bins and score them in sentiment and popularity
-	-- method by averaging sentiments over all occurrences of topic words
+	-- method by averaging sentiments over all occurrences of topic words;
+	popularity measured by incrementing topic count for each occurence of word
 	"""
 
 	collection = DB.read(cllxn)
@@ -250,18 +316,6 @@ def score_topics(cllxn):
 	with open("posts/confessions/content/topics.json", "wb") as outfile:
 		json.dump(topic_dumps, outfile, indent=4)
 
-	# post_dumps = []
-	# for topic in topic_to_words.keys():
-	# 	for post in topic_to_posts[topic]:
-	# 		post_dumps.append({
-	# 			"topic" : topic,
-	# 			"topic_popularity" : topic_to_popularity[topic],
-	# 			"sentiment" : post["sentiment"],
-	# 			"id" : post["id"],
-	# 			"len" : post["len"],
-	# 		})
-	# with open("posts/confessions/content/posts.json", "wb") as outfile:
-	# 	json.dump(post_dumps, outfile)
 
 def len_vs_sentiment(cllxn):
 	"""measure length vs sentiment (also likes)"""
@@ -506,7 +560,10 @@ if __name__ == '__main__':
 			score_topics_summary(cllxn)
 		if e == "len_vs_sentiment":
 			len_vs_sentiment(cllxn)
-
+		if e == "temporal_stats":
+			temporal_stats(cllxn)
+		if e == "topic_markov":
+			topic_markov(cllxn)
 
 
 
