@@ -1,9 +1,6 @@
 {
  "name": "flare",
  "children": [
-  {
-   "name": "topics",
-   "children": [
     {
         "name": "Desire", 
         "value": 2756, 
@@ -238,9 +235,5 @@
             "tisch"
         ]
     }
-
-
-    ]
-  }
 ]}
     

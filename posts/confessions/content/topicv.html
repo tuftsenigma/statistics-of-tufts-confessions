@@ -62,93 +62,6 @@ Topics in Tufts Confessions
 <script>
 
 
-// var width = 700,
-//     height = 900,
-//     xshift = -150,
-//     yshift = -50;
-
-
-// var tip = d3.tip()
-//   .attr('class', 'd3-tip')
-//   .style("position", "absolute")
-//   .offset(function(d) {
-//     console.log(d);
-//     return [200,200]
-//   })
-//   .html(function(d) {
-//       if (!d.children) {
-//         text = "<span style='color:#C80000'>Popular words</span><br><br>";
-//         for (var i = 0, len = d["words"].length; i < len; i++) {
-//           text += d["words"][i] + "<br>";
-//         }
-//         return text;
-//       } else { 
-//         return ""; 
-//       }
-//   });
-
-
-// var svg = d3.select("body").append("svg")
-//     .attr("width", width)
-//     .attr("height", height)
-//     .append("g")
-//         .attr("transform", "translate(50,50)")
-//     .call(tip);
-
-
-
-// d3.json("topics.json", function(data) {
-//   // scale
-//   var xScale = d3.scale.linear()
-//       .domain([0, d3.max(data, function(d) { return d["count"];})])
-//       .range([0, 500]);
-
-//   var rScale = d3.scale.linear()
-//       .domain([0, d3.max(data, function(d) { return d["count"];})])
-//       .range([0, 100]);
-
-
-
-//   // hardcode relative positions
-//   var pos = [0]
-//   for (var i = 1; i < data.length; i++) {
-//     pos.push(rScale(data[i].count)*1.4 + pos[i - 1]);
-//   }
-//   var circle = svg.append("g")
-//     .attr("class", "nodes")
-//   .selectAll("circle")
-//       .data(data).enter()
-//         .append("circle")
-//           .attr("fill", "steelblue")
-//           .attr("cy", function(d,i) { 
-//             return pos[i] - 30
-//           })
-//           .attr("cx", function(d, i) { return 90})
-//           .attr("r", function(d) { return rScale(d["count"]); })
-//           .on("mouseover", mouseOver)
-//           .on("mouseover.tooltip", tip.show)
-//           .on("mouseout", mouseOut)
-//           .on("mouseout.tooltip", tip.hide);
-
-//   // provides node animation for mouseover
-//     function mouseOver() {
-//         d3.select(this).transition()
-//             .duration(300)
-//             .attr("r", function(d) { return rScale(d["count"]) + 10; })
-//     };
-
-//     function mouseOut() {
-//         d3.select(this).transition()
-//             .duration(300)
-//             .attr("r", function(d) { return rScale(d["count"]); });
-//     };
-
-
-
-// });
-
-// WAY 2
-
 var width = 700,
     height = 500,
     xshift = -180,
@@ -160,7 +73,7 @@ var tip = d3.tip()
   .style("position", "absolute")
   .offset(function(d) {
     console.log(d);
-    return [300 - d.y,650 - d.x]
+    return [400 - d.y,625 - d.x]
   })
   .html(function(d) {
       if (!d.children) {
@@ -178,7 +91,7 @@ var tip = d3.tip()
   });
 
 
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#topicv").append("svg")
     .attr("width", width)
     .attr("height", height)
     .append("g")
@@ -208,15 +121,6 @@ var pack = d3.layout.pack()
       .style("font-size", "15px")
       .style("text-align", "center")
       .attr("pointer-events", "none");
-
-  // var tooltip = d3.select("body")
-  //   .append("div")
-  //   .style("position", "absolute")
-  //   .style("z-index", "10")
-  //   .style("visibility", "hidden")
-  //   .text(function(d){
-  //     return "yo";
-  //   });
 
 
   var nodes = pack.nodes(data);

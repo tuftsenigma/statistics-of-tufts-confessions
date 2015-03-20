@@ -1,0 +1,170 @@
+from,to,count
+Body,Body,1541
+Body,Desire,155
+Body,Bathroom,159
+Body,Status & domestic,147
+Body,Social dynamic,359
+Body,Sexual,46
+Body,Loneliness,1118
+Body,Time,289
+Body,Social issues,355
+Body,Sexual assault,80
+Body,Party,225
+Body,Academic experience,75
+Body,Someone hot,104
+Desire,Body,144
+Desire,Desire,3989
+Desire,Bathroom,266
+Desire,Status & domestic,336
+Desire,Social dynamic,869
+Desire,Sexual,140
+Desire,Loneliness,2713
+Desire,Time,838
+Desire,Social issues,854
+Desire,Sexual assault,272
+Desire,Party,492
+Desire,Academic experience,121
+Desire,Someone hot,271
+Bathroom,Body,95
+Bathroom,Desire,196
+Bathroom,Bathroom,3446
+Bathroom,Status & domestic,337
+Bathroom,Social dynamic,593
+Bathroom,Sexual,138
+Bathroom,Loneliness,1820
+Bathroom,Time,674
+Bathroom,Social issues,687
+Bathroom,Sexual assault,169
+Bathroom,Party,416
+Bathroom,Academic experience,110
+Bathroom,Someone hot,306
+Status & domestic,Body,112
+Status & domestic,Desire,324
+Status & domestic,Bathroom,347
+Status & domestic,Status & domestic,3545
+Status & domestic,Social dynamic,859
+Status & domestic,Sexual,165
+Status & domestic,Loneliness,2691
+Status & domestic,Time,1010
+Status & domestic,Social issues,959
+Status & domestic,Sexual assault,200
+Status & domestic,Party,464
+Status & domestic,Academic experience,138
+Status & domestic,Someone hot,256
+Social dynamic,Body,333
+Social dynamic,Desire,960
+Social dynamic,Bathroom,760
+Social dynamic,Status & domestic,996
+Social dynamic,Social dynamic,11503
+Social dynamic,Sexual,273
+Social dynamic,Loneliness,7221
+Social dynamic,Time,1899
+Social dynamic,Social issues,3115
+Social dynamic,Sexual assault,653
+Social dynamic,Party,1012
+Social dynamic,Academic experience,483
+Social dynamic,Someone hot,617
+Sexual,Body,71
+Sexual,Desire,108
+Sexual,Bathroom,129
+Sexual,Status & domestic,131
+Sexual,Social dynamic,242
+Sexual,Sexual,1100
+Sexual,Loneliness,813
+Sexual,Time,289
+Sexual,Social issues,251
+Sexual,Sexual assault,100
+Sexual,Party,162
+Sexual,Academic experience,35
+Sexual,Someone hot,112
+Loneliness,Body,904
+Loneliness,Desire,2298
+Loneliness,Bathroom,2104
+Loneliness,Status & domestic,2452
+Loneliness,Social dynamic,6495
+Loneliness,Sexual,729
+Loneliness,Loneliness,34279
+Loneliness,Time,4520
+Loneliness,Social issues,6000
+Loneliness,Sexual assault,1391
+Loneliness,Party,3044
+Loneliness,Academic experience,909
+Loneliness,Someone hot,1271
+Time,Body,304
+Time,Desire,879
+Time,Bathroom,842
+Time,Status & domestic,1066
+Time,Social dynamic,1933
+Time,Sexual,385
+Time,Loneliness,6439
+Time,Time,9323
+Time,Social issues,1823
+Time,Sexual assault,479
+Time,Party,1206
+Time,Academic experience,277
+Time,Someone hot,652
+Social issues,Body,287
+Social issues,Desire,728
+Social issues,Bathroom,652
+Social issues,Status & domestic,827
+Social issues,Social dynamic,2617
+Social issues,Sexual,236
+Social issues,Loneliness,5650
+Social issues,Time,1540
+Social issues,Social issues,7033
+Social issues,Sexual assault,536
+Social issues,Party,861
+Social issues,Academic experience,348
+Social issues,Someone hot,393
+Sexual assault,Body,99
+Sexual assault,Desire,319
+Sexual assault,Bathroom,318
+Sexual assault,Status & domestic,258
+Sexual assault,Social dynamic,652
+Sexual assault,Sexual,105
+Sexual assault,Loneliness,2053
+Sexual assault,Time,590
+Sexual assault,Social issues,729
+Sexual assault,Sexual assault,2656
+Sexual assault,Party,317
+Sexual assault,Academic experience,105
+Sexual assault,Someone hot,138
+Party,Body,180
+Party,Desire,525
+Party,Bathroom,475
+Party,Status & domestic,413
+Party,Social dynamic,996
+Party,Sexual,188
+Party,Loneliness,2819
+Party,Time,966
+Party,Social issues,1110
+Party,Sexual assault,223
+Party,Party,5322
+Party,Academic experience,180
+Party,Someone hot,397
+Academic experience,Body,68
+Academic experience,Desire,134
+Academic experience,Bathroom,132
+Academic experience,Status & domestic,166
+Academic experience,Social dynamic,424
+Academic experience,Sexual,37
+Academic experience,Loneliness,901
+Academic experience,Time,274
+Academic experience,Social issues,408
+Academic experience,Sexual assault,117
+Academic experience,Party,189
+Academic experience,Academic experience,1337
+Academic experience,Someone hot,73
+Someone hot,Body,109
+Someone hot,Desire,256
+Someone hot,Bathroom,276
+Someone hot,Status & domestic,234
+Someone hot,Social dynamic,561
+Someone hot,Sexual,119
+Someone hot,Loneliness,1468
+Someone hot,Time,607
+Someone hot,Social issues,497
+Someone hot,Sexual assault,136
+Someone hot,Party,474
+Someone hot,Academic experience,97
+Someone hot,Someone hot,2782

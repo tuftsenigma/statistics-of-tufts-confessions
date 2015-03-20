@@ -1,17 +1,52 @@
 [
     {
-        "topic": "Desire", 
-        "count": 2756, 
-        "popularity": 0.06638884204947848, 
+        "topic": "Sexual", 
+        "count": 848, 
+        "popularity": 0.020427336015224146, 
         "words": [
-            "attractive", 
-            "hooked", 
-            "interested", 
-            "hooking", 
-            "anyone", 
-            "best", 
-            "sexually", 
-            "campus"
+            "dick", 
+            "frat", 
+            "gave", 
+            "public", 
+            "cum", 
+            "laid", 
+            "guilty", 
+            "transfer", 
+            "running", 
+            "stranger"
+        ]
+    }, 
+    {
+        "topic": "Academic experience", 
+        "count": 885, 
+        "popularity": 0.021318623081926145, 
+        "words": [
+            "liberal", 
+            "major", 
+            "conservative", 
+            "absolutely", 
+            "cry", 
+            "turns", 
+            "easy", 
+            "homework", 
+            "gotta", 
+            "power"
+        ]
+    }, 
+    {
+        "topic": "Sexual assault", 
+        "count": 1251, 
+        "popularity": 0.030135138390383735, 
+        "words": [
+            "rape", 
+            "hate", 
+            "sexual", 
+            "culture", 
+            "raped", 
+            "trigger", 
+            "assault", 
+            "ate", 
+            "ATO"
         ]
     }, 
     {
@@ -34,21 +69,22 @@
         ]
     }, 
     {
-        "topic": "Social issues", 
-        "count": 4128, 
-        "popularity": 0.09943873003637414, 
+        "topic": "Bathroom", 
+        "count": 1666, 
+        "popularity": 0.04013200684123046, 
         "words": [
-            "things", 
-            "many", 
-            "social", 
-            "isn't", 
-            "still", 
-            "trying", 
-            "others", 
-            "issues", 
-            "racism", 
-            "without", 
-            "understand"
+            "penis", 
+            "bathroom", 
+            "toilet", 
+            "poop", 
+            "paper", 
+            "clean", 
+            "seat", 
+            "put", 
+            "houses", 
+            "step", 
+            "take", 
+            "pee"
         ]
     }, 
     {
@@ -69,93 +105,76 @@
             "bad", 
             "poor"
         ]
+    },
+    {
+        "topic": "Someone hot", 
+        "count": 1917, 
+        "popularity": 0.04617830559101968, 
+        "words": [
+            "sexy", 
+            "next", 
+            "sitting", 
+            "man", 
+            "name", 
+            "hair", 
+            "gym", 
+            "naked", 
+            "dark", 
+            "dining", 
+            "ATO", 
+            "tisch"
+        ]
+    },
+    {
+        "topic": "Desire", 
+        "count": 2756, 
+        "popularity": 0.06638884204947848, 
+        "words": [
+            "attractive", 
+            "hooked", 
+            "interested", 
+            "hooking", 
+            "anyone", 
+            "best", 
+            "sexually", 
+            "campus"
+        ]
     }, 
     {
-        "topic": "Social dynamic", 
-        "count": 6120, 
-        "popularity": 0.1474236986004384, 
+        "topic": "Party", 
+        "count": 3040, 
+        "popularity": 0.07323007250740732, 
         "words": [
-            "people", 
-            "white", 
-            "black", 
-            "privilege", 
-            "think", 
-            "race", 
+            "room", 
+            "dance", 
+            "floor", 
+            "door", 
+            "stop", 
+            "walk", 
+            "around", 
+            "please", 
+            "smoke", 
+            "weed", 
+            "finals", 
+            "head"
+        ]
+    },
+    {
+        "topic": "Social issues", 
+        "count": 4128, 
+        "popularity": 0.09943873003637414, 
+        "words": [
+            "things", 
+            "many", 
             "social", 
-            "gay", 
-            "world"
-        ]
-    }, 
-    {
-        "topic": "Sexual assault", 
-        "count": 1251, 
-        "popularity": 0.030135138390383735, 
-        "words": [
-            "rape", 
-            "hate", 
-            "sexual", 
-            "culture", 
-            "raped", 
-            "trigger", 
-            "assault", 
-            "ate", 
-            "ATO"
-        ]
-    }, 
-    {
-        "topic": "Loneliness", 
-        "count": 9545, 
-        "popularity": 0.22992797436947462, 
-        "words": [
-            "want", 
-            "people", 
-            "care", 
-            "eat", 
-            "sometimes", 
-            "go", 
-            "time", 
-            "wish", 
-            "alone", 
-            "body", 
-            "someone", 
-            "talk", 
-            "stop"
-        ]
-    }, 
-    {
-        "topic": "Bathroom", 
-        "count": 1666, 
-        "popularity": 0.04013200684123046, 
-        "words": [
-            "penis", 
-            "bathroom", 
-            "toilet", 
-            "poop", 
-            "paper", 
-            "clean", 
-            "seat", 
-            "put", 
-            "houses", 
-            "step", 
-            "take", 
-            "pee"
-        ]
-    }, 
-    {
-        "topic": "Academic experience", 
-        "count": 885, 
-        "popularity": 0.021318623081926145, 
-        "words": [
-            "liberal", 
-            "major", 
-            "conservative", 
-            "absolutely", 
-            "cry", 
-            "turns", 
-            "easy", 
-            "homework", 
-            "gotta", 
-            "power"
+            "isn't", 
+            "still", 
+            "trying", 
+            "others", 
+            "issues", 
+            "racism", 
+            "without", 
+            "understand"
         ]
     }, 
     {
@@ -177,60 +196,41 @@
             "day", 
             "job"
         ]
-    }, 
+    },
     {
-        "topic": "Party", 
-        "count": 3040, 
-        "popularity": 0.07323007250740732, 
+        "topic": "Social dynamic", 
+        "count": 6120, 
+        "popularity": 0.1474236986004384, 
         "words": [
-            "room", 
-            "dance", 
-            "floor", 
-            "door", 
-            "stop", 
-            "walk", 
-            "around", 
-            "please", 
-            "smoke", 
-            "weed", 
-            "finals", 
-            "head"
+            "people", 
+            "white", 
+            "black", 
+            "privilege", 
+            "think", 
+            "race", 
+            "social", 
+            "gay", 
+            "world"
         ]
     }, 
     {
-        "topic": "Sexual", 
-        "count": 848, 
-        "popularity": 0.020427336015224146, 
+        "topic": "Loneliness", 
+        "count": 9545, 
+        "popularity": 0.22992797436947462, 
         "words": [
-            "dick", 
-            "frat", 
-            "gave", 
-            "public", 
-            "cum", 
-            "laid", 
-            "guilty", 
-            "transfer", 
-            "running", 
-            "stranger"
+            "want", 
+            "people", 
+            "care", 
+            "eat", 
+            "sometimes", 
+            "go", 
+            "time", 
+            "wish", 
+            "alone", 
+            "body", 
+            "someone", 
+            "talk", 
+            "stop"
         ]
-    }, 
-    {
-        "topic": "Someone hot", 
-        "count": 1917, 
-        "popularity": 0.04617830559101968, 
-        "words": [
-            "sexy", 
-            "next", 
-            "sitting", 
-            "man", 
-            "name", 
-            "hair", 
-            "gym", 
-            "naked", 
-            "dark", 
-            "dining", 
-            "ATO", 
-            "tisch"
-        ]
-    }
+    } 
 ]

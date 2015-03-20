@@ -84,7 +84,8 @@ var tip = d3.tip()
     return [this.getBBox().height - 100]
   })
   .html(function(d) {
-    text = "'";
+    text = "<span style='color:#C80000'>Popular expressions</span><br><br>";
+    text += "'";
     for (var i = 0, len = d["words"].length; i < len; i++){
         text += d["words"].charAt(i);
         if (d["words"].charAt(i) == ",") {
