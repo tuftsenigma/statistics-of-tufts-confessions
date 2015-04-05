@@ -1,0 +1,239 @@
+{
+ "name": "flare",
+ "children": [
+    {
+        "name": "Desire", 
+        "value": 2756, 
+        "popularity": 0.06638884204947848, 
+        "words": [
+            "attractive", 
+            "hooked", 
+            "interested", 
+            "hooking", 
+            "anyone", 
+            "best", 
+            "sexually", 
+            "campus"
+        ]
+    }, 
+    {
+        "name": "Body", 
+        "value": 1402, 
+        "popularity": 0.03377255317611351, 
+        "words": [
+            "pants", 
+            "body", 
+            "free", 
+            "fat", 
+            "drinking", 
+            "eating", 
+            "obsessed", 
+            "gonna", 
+            "thin", 
+            "skinny", 
+            "social", 
+            "marriage"
+        ]
+    }, 
+    {
+        "name": "Social issues", 
+        "value": 4128, 
+        "popularity": 0.09943873003637414, 
+        "words": [
+            "things", 
+            "many", 
+            "social", 
+            "isn't", 
+            "still", 
+            "trying", 
+            "others", 
+            "issues", 
+            "racism", 
+            "without", 
+            "understand"
+        ]
+    }, 
+    {
+        "name": "Domestic", 
+        "value": 1877, 
+        "popularity": 0.0452147520053959, 
+        "words": [
+            "money", 
+            "kids", 
+            "rich", 
+            "sorority", 
+            "porn", 
+            "grades", 
+            "family", 
+            "huge", 
+            "enough", 
+            "parents", 
+            "bad", 
+            "poor"
+        ]
+    }, 
+    {
+        "name": "Social dynamic", 
+        "value": 6120, 
+        "popularity": 0.1474236986004384, 
+        "words": [
+            "people", 
+            "white", 
+            "black", 
+            "privilege", 
+            "think", 
+            "race", 
+            "social", 
+            "gay", 
+            "world"
+        ]
+    }, 
+    {
+        "name": "Sexual assault", 
+        "value": 1251, 
+        "popularity": 0.030135138390383735, 
+        "words": [
+            "rape", 
+            "hate", 
+            "sexual", 
+            "culture", 
+            "raped", 
+            "trigger", 
+            "assault", 
+            "ate", 
+            "ATO"
+        ]
+    }, 
+    {
+        "name": "Loneliness", 
+        "value": 9545, 
+        "popularity": 0.22992797436947462, 
+        "words": [
+            "want", 
+            "people", 
+            "care", 
+            "eat", 
+            "sometimes", 
+            "go", 
+            "time", 
+            "wish", 
+            "alone", 
+            "body", 
+            "someone", 
+            "talk", 
+            "stop"
+        ]
+    }, 
+    {
+        "name": "Bathroom", 
+        "value": 1666, 
+        "popularity": 0.04013200684123046, 
+        "words": [
+            "penis", 
+            "bathroom", 
+            "toilet", 
+            "poop", 
+            "paper", 
+            "clean", 
+            "seat", 
+            "put", 
+            "houses", 
+            "step", 
+            "take", 
+            "pee"
+        ]
+    }, 
+    {
+        "name": "Academic", 
+        "value": 885, 
+        "popularity": 0.021318623081926145, 
+        "words": [
+            "liberal", 
+            "major", 
+            "conservative", 
+            "absolutely", 
+            "cry", 
+            "turns", 
+            "easy", 
+            "homework", 
+            "gotta", 
+            "power"
+        ]
+    }, 
+    {
+        "name": "Time", 
+        "value": 6078, 
+        "popularity": 0.14641196733553344, 
+        "words": [
+            "year", 
+            "time", 
+            "freshman", 
+            "first", 
+            "week", 
+            "every", 
+            "page", 
+            "still", 
+            "last", 
+            "go", 
+            "yet", 
+            "day", 
+            "job"
+        ]
+    }, 
+    {
+        "name": "Party", 
+        "value": 3040, 
+        "popularity": 0.07323007250740732, 
+        "words": [
+            "room", 
+            "dance", 
+            "floor", 
+            "door", 
+            "stop", 
+            "walk", 
+            "around", 
+            "please", 
+            "smoke", 
+            "weed", 
+            "finals", 
+            "head"
+        ]
+    }, 
+    {
+        "name": "Sexual", 
+        "value": 848, 
+        "popularity": 0.020427336015224146, 
+        "words": [
+            "dick", 
+            "frat", 
+            "gave", 
+            "public", 
+            "cum", 
+            "laid", 
+            "guilty", 
+            "transfer", 
+            "running", 
+            "stranger"
+        ]
+    }, 
+    {
+        "name": "Someone hot", 
+        "value": 1917, 
+        "popularity": 0.04617830559101968, 
+        "words": [
+            "sexy", 
+            "next", 
+            "sitting", 
+            "man", 
+            "name", 
+            "hair", 
+            "gym", 
+            "naked", 
+            "dark", 
+            "dining", 
+            "ATO", 
+            "tisch"
+        ]
+    }
+]}
+    

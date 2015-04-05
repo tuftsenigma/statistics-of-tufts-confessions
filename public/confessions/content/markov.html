@@ -1,51 +1,12 @@
-<style>
-
-  #tooltip {
-    font: 15px "Roboto Condensed";
-    color: white;
-    opacity: .9;
-    background: #333;
-    padding: 5px;
-    border: 1px solid lightgrey;
-    border-radius: 5px;
-    position: absolute;
-    z-index: 10;
-    visibility: hidden;
-    white-space: nowrap;
-    pointer-events: none;
-  }
-  #circle circle {
-    fill: none;
-    pointer-events: all;
-  }
-  path.group {
-    fill-opacity: .8;
-  }
-  path.chord {
-    fill-opacity: .8;
-    stroke: #000;
-    stroke-width: .25px;
-  }
-  #circle:hover path.fade {
-    display: none;
-  }
-</style>
+<meta charset="utf-8">
 
 
-<body>
-<div id="tooltip"></div>
 
 
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="mapper.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js"></script>
-
-<script type="text/javascript">
-
-/* create matrix and map from data */
-d3.csv('topic_markov.csv', function (error, data) {
+<script>
+/* create matrix and map from data - HOST DEPENDENT */
+d3.csv('http://181.224.138.130/~trends37/wp-content/data/confessions/topic_markov.csv', function (error, data) {
     var mpr = chordMpr(data);
-
     mpr
       .addValuesToMap('from')
       .setFilter(function (row, a, b) {
@@ -64,11 +25,12 @@ function drawChords (matrix, mmap, owes) {
   var w = 980, 
       h = 800, 
       r1 = h / 2, 
-      r0 = r1 - 100;
+      r0 = r1 - 150;
 
   var fill = d3.scale.ordinal()
       .domain([0, 1, 2])
-      .range(["#DB704D", "#D2D0C6", "#ECD08D", "#F8EDD3"]);
+      .range(["#2D1E09", "#CFB8B2", "#D2D0C6", "#A8B1AE", "#556193", "#801606", "#6F805D", 
+      "#E6900B", "#312340", "#E6C59C", "#E6605F", "#FFFF8A", "#E35565", "#B40114"]);
 
   var chord = d3.layout.chord()
       .padding(.02)
@@ -79,14 +41,28 @@ function drawChords (matrix, mmap, owes) {
       .innerRadius(r0)
       .outerRadius(r0 + 20);
 
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select(".wpd3-31-2").append("svg")
       .attr("width", w)
       .attr("height", h)
     .append("svg:g")
       .attr("id", "circle")
-      .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
+      .attr("transform", "translate(" + w/3 + "," + 5*h / 9 + ")");
       svg.append("circle")
           .attr("r", r0 + 20);
+
+    // title
+  svg.append("text")
+        .attr("x", -300)             
+        .attr("y", -428)
+        .style("font-size", "20px") 
+        .text("How Topics Change within Confessions");
+
+  svg.append("text")
+        .attr("x", -300)             
+        .attr("y", -400)
+        .style("font-size", "16px")
+        .attr("fill", "#989898")
+        .text("Markov model of topic transitions in confessions (hover over chords)");
 
   var rdr = chordRdr(matrix, mmap);
   chord.matrix(matrix);
@@ -97,9 +73,7 @@ function drawChords (matrix, mmap, owes) {
     .enter().append("svg:g")
       .attr("class", "group")
       .on("mouseover", mouseover);
-      // .on("mouseout", function (d) { 
-      //   d3.select("#tooltip").style("visibility", "hidden") 
-      // });
+
 
   g.append("svg:path")
       .style("stroke", "black")
@@ -111,8 +85,7 @@ function drawChords (matrix, mmap, owes) {
         d.angle = (d.startAngle + d.endAngle) / 2; 
       })
       .attr("dy", ".35em")
-      .style("font", "Robot Condensed")
-      .style("font-family", "helvetica, arial, sans-serif")
+      .style("font", "Roboto Condensed")
       .style("font-size", "10px")
       .attr("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
       .attr("transform", function(d) {
@@ -143,27 +116,22 @@ function drawChords (matrix, mmap, owes) {
       return "<span style='color:#C80000'>" + p(d.svalue/d.stotal) + "</span>"
       // + " (" + q(d.svalue) 
         + " of '"
-        + d.sname + "' leads to topic '" + d.tname
+        + d.sname 
+        + (d.sname === d.tname ? "' leads back to topic '" : "' leads to topic '" )
+        + d.tname
         + (d.sname === d.tname ? "'": ("'<br>"
         + "<span style='color:#C80000'>" + p(d.tvalue/d.ttotal) + "</span>"
         // + " (" + q(d.tvalue) 
         + " of '"
-        + d.tname + "' leads back to topic '" + d.sname + "'"))
+        + d.tname + "' leads to topic '" + d.sname + "'"))
     }
 
 
     function mouseover(d, i) {
-      // d3.select("#tooltip")
-      //   .style("visibility", "visible")
-      //   // .html(groupTip(rdr(d)))
-      //   .style("top", function () { return (d3.event.pageY - 80)+"px"})
-      //   .style("left", function () { return (d3.event.pageX - 130)+"px";})
       chordPaths.classed("fade", function(p) {
         return p.source.index != i
             && p.target.index != i;
       });
     }
   }
-
 </script>
-

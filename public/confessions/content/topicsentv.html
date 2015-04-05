@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.circle {
+    stroke: blue;
+    stroke-width: 0;
+    fill: #333;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  position: absolute;
+  left: 350px;
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 10px;
+}
+
+
+</style>
+
+
+<h3>
+Patterns in Popular Topics
+</h3>
+
+<div id="topicsentv"></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+
+<script>
+
+    // vis data
+    d3.json("posts.json", function(json) {
+        data = json;
+        visualize(data);
+    });
+
+    var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden");
+
+    function visualize(data) {
+        // size + margin vars
+        var margin = {top: 20, right: 20, bottom: 30, left: 50},
+            width = 500 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        // scales
+
+        var lFill = d3.scale.linear()
+            .domain([0, d3.max(data, function(d){ return d["len"]})])
+            .range([0.01, 0.1]);
+
+        var cScale = d3.scale.linear()
+            .domain([0, d3.max(data, function(d){ return d["len"]})])
+            .range([1, 30]);
+
+        var xScale = d3.scale.linear()
+            .domain([0.0, 1.0])
+            .range([0, width]);
+
+        var yScale = d3.scale.linear()
+            .domain([0, 20000])
+            .range([height, 0]);
+
+        // func for x axis
+        var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .orient("bottom")
+            .ticks(10);
+
+        // func for y axis
+        var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .orient("left")
+            .ticks(6);
+
+        // svg
+        var svg = d3.select("#topicsentv").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+
+        // scatterplot
+        svg.selectAll("circle")
+        .data(data)
+        .enter().append("circle")
+        .attr("cy", function(d) { return yScale(d["topic_popularity"]); })
+        .attr("cx", function(d) { return xScale(d["sentiment"]); })
+        .attr("r", function(d) { return cScale(d["len"]); })
+        .attr('fill-opacity', function(d) { return lFill(d["len"])});
+
+        // xaxis
+        svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + 0 + "," + height + ")")
+            .call(xAxis)
+        .append("text")
+            .attr("y", 22)
+            .attr("x", 240)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Sentiment");
+
+        // yaxis
+        svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", "translate(" + 0 + ",0)")
+            .call(yAxis)
+        .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 48 - (height / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Posts");
+
+
+    }
+
+
+</script>
+
+
+

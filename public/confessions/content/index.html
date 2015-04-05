@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.bar {
+  fill: #C80000;
+}
+
+.bar:hover {
+  fill: #FF9966;
+  opacity: 0.8;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+text {
+  font: 10px sans-serif;
+}
+
+.x.axis path {
+  display: none;
+}
+
+
+.d3-tip1 {
+  font: 15px "Roboto Condensed";
+  line-height: 1;
+  visibility: visible;
+  font-weight: bold;
+  left: 370px;
+  position: fixed;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 20px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip1:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip1.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.d3-tip2 {
+  font: 15px sans-serif;
+  line-height: 1;
+  visibility: visible;
+  font-weight: bold;
+  left: 100px;
+  position: fixed;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 20px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip2:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  right: 100px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.9);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip2.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+
+
+</style>
+
+<h3>
+The Sentiment Spectrum
+</h3>
+
+<div id="sentv"></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip1')
+  .style("position", "absolute")
+  .offset(function() {
+    return [this.getBBox().height - 100]
+  })
+  .html(function(d) {
+    text = "<span style='color:#C80000'>Popular expressions</span><br><br>";
+    text += "'";
+    for (var i = 0, len = d["words"].length; i < len; i++){
+        text += d["words"].charAt(i);
+        if (d["words"].charAt(i) == ",") {
+          text += "'<br>'";
+        }
+    }
+    return text + "'";
+  });
+
+
+// size + margin vars
+var margin = {top: 20, right: 20, bottom: 30, left: 60},
+    width = 500 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+// bar width var
+var x = d3.scale.ordinal()
+    .rangeRoundBands([0, width], 0.03);
+
+// func for y size
+var y = d3.scale.linear()
+    .range([height, 0]);
+
+// func for x axis
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+// func for y axis
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");
+
+// create svg
+var svg = d3.select("#sentv").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    .call(tip);
+
+// input data
+d3.tsv("sentiment.tsv", type, function(error, data) {
+  x.domain(data.map(function(d) { return d["score"]; }));
+  y.domain([0, d3.max(data, function(d) { return d["count"]; })]);
+
+  // x axis params
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("y", 22)
+      .attr("x", 240)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Sentiment");
+
+  // y axis params
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10 - margin.left)
+      .attr("x", 10 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Number of posts");;
+
+  // graphing data
+  svg.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", function(d) { return x(d["score"]); })
+      .attr("width", x.rangeBand())
+      .attr("y", function(d) { return y(d["count"]); })
+      .attr("height", function(d) { return height - y(d["count"]); })
+      .on("mouseover", tip.show)        
+      .on("mouseout", tip.hide);
+});
+
+
+function type(d) {
+  d["count"] = +d["count"];
+  return d;
+}
+
+</script>
+
+
+
+<h3>
+Specific Topics Expressed in Tufts Confessions
+</h3>
+
+<div id="topicv">
+</div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script>
+
+
+var width = 700,
+    height = 500,
+    xshift = -180,
+    yshift = -500;
+
+
+var tip = d3.tip()
+  .attr('class', 'd3-tip2')
+  .style("position", "absolute")
+  .offset(function(d) {
+    console.log(d);
+    return [400 - d.y,625 - d.x]
+  })
+  .html(function(d) {
+      if (!d.children) {
+        tip.style("visibility", "visible");
+        text = "<span style='color:#C80000'>Popular words</span><br><br>";
+        for (var i = 0, len = d["words"].length; i < len; i++) {
+          text += d["words"][i] + "<br>";
+        }
+        return text;
+      } else {
+        // hide
+        tip.style("visibility", "hidden");
+        return ""; 
+      }
+  });
+
+
+var svg = d3.select("#topicv").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+        .attr("transform", "translate(50,50)")
+    .call(tip);
+
+
+
+d3.json("topictree.json", function(data) {
+var pack = d3.layout.pack()
+    .size([width, height - 50])
+    .padding(5);
+
+
+  var text = svg.append("g")
+    .attr("class", "labels")
+  .selectAll("text")
+    .data(data).enter()
+      .append("text")
+        .text(function(d) {
+          return d.topic;
+        })
+      .attr("text-anchor", "middle")
+      .style("fill", "black")
+      .attr("dx", function(d, i) { return d.topic.length*15; })
+      .attr("dy", 60)
+      .style("font-size", "15px")
+      .style("text-align", "center")
+      .attr("pointer-events", "none");
+
+
+  var nodes = pack.nodes(data);
+  var node = svg.selectAll(".node")
+      .data(nodes)
+      .enter()
+      .append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) { return "translate(" + (d.x + xshift) + "," + (d.y + yshift) + ")";});
+
+  node.append("circle")
+      .attr("r", function(d) { return d.r; })
+      .attr("fill", function(d) { return d.children ? "#fff" : "steelblue"})
+      .attr("opacity", 1.0)
+      .attr("stroke", function(d) { return d.children ? "#fff" : "black"})
+      .attr("stroke-width", "0")
+      .on("mouseover", mouseOver)
+      .on("mouseover.tooltip", tip.show)
+      .on("mouseout", mouseOut)
+      .on("mouseout.tooltip", tip.hide);
+
+
+  // topic text
+  node.append("text")
+      .text(function(d) {
+        if (!d.children) {
+          var text = "";
+          for (var i = 0, len = d["name"].length; i < len; i++) {
+            text += d["name"].charAt(i);
+            if (d["name"].charAt(i) == " ") {
+              text += "\n";
+            }
+          }
+          return text;
+        } else {
+          return "";
+        }
+      })
+      .attr("text-anchor", "middle")
+      .style("fill", "white")
+      .style("font-size", function(d) {
+        size = 15 - (d.name.length/2)
+        if (d.value > 4000) {
+          size += d.value/600;
+        }
+        return size;
+      })
+      .attr('padding', '2px;')
+      .attr("pointer-events", "none");
+
+  // popularity stat text
+  node.append("text")
+      .text(function(d) {
+        if (!d.children) {
+          text = "" + d["popularity"];
+          text = text.substring(2,4);
+          if (text.charAt(0) == 0) {
+            text = text.substring(1,4);
+          }
+          return text + "%";
+        } else {
+          return "";
+        }
+      })
+      .attr("text-anchor", "middle")
+      .style("fill", "white")
+      .style("font-size", function(d){
+        size = 15 - (d.name.length/2)
+        if (d.value > 4000) {
+          size += d.value/600;
+        }
+        return size;
+      })
+      .attr("y", function(d){
+        size = 15 - (d.name.length/2)
+        if (d.value > 4000) {
+          size += d.value/600;
+        }
+        return size;     
+
+      })
+      .style("text-align", "center")
+      .attr("pointer-events", "none");
+
+
+  // provides node animation for mouseover
+    function mouseOver() {
+        d3.select(this).transition()
+            .duration(300)
+            .attr("opacity", 0.6);
+    };
+
+    function mouseOut() {
+        d3.select(this).transition()
+            .duration(300)
+            .attr("opacity", 1.0);
+
+    };
+
+});
+
+
+
+
+
+</script>
+
+
