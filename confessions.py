@@ -193,7 +193,7 @@ def temporal_stats(docs):
 	print (float(sum(monthly_counts.values())) / float(len(monthly_counts.keys())))
 
 
-def topic_markov(docs):
+def topic_markov(cllxn):
 	'''
 	created a directed acyclic graph of topics (markov chain)'''
 	collection = DB.read(cllxn)
@@ -208,26 +208,35 @@ def topic_markov(docs):
 		for t in topics:
 			ws = t[1].split(",")
 			topic_to_words[t[0]] = ws
-			for t2 in topics:
-				topic_to_topic[t[0]][t2[0]] = 0
+			topic_to_topic[t[0]] = {}
 			for w in ws:
 				word_to_topics[w] = t[0]
 
+		for t2 in topic_to_topic.keys():
+			for t in topic_to_topic.keys():
+				topic_to_topic[t][t2] = 0
 
-		for post in posts: # jesus... O(n^2)
-			doc = post["message"].encode('utf-8').split()
-			doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english")]
-			for i in xrange(len(doc)):
-				try:
-					from_topic = word_to_topics[doc[i]]
-					for j in xrange(i, len(doc)):
-						try:
-							to_topic = word_to_topics[doc[j]]
-							topic_to_topic[from_topic][to_topic] += 1
-						except KeyError:
-							continue
-				except KeyError:
-					continue
+		print topic_to_topic
+
+		for p, post in enumerate(posts): # jesus... O(n^2)
+			print "parsed {} posts".format(p)
+			try:
+				doc = post["message"].encode('utf-8').split()
+				doc = [word.lower() for word in doc if word.lower() not in stopwords.words("english")]
+				for i in xrange(len(doc)):
+					try:
+						from_topic = word_to_topics[doc[i]]
+						for j in xrange(i, len(doc)):
+							try:
+								to_topic = word_to_topics[doc[j]]
+								topic_to_topic[from_topic][to_topic] += 1
+							except KeyError:
+								continue
+					except KeyError:
+						continue
+			except KeyError:
+				continue
+
 
 
 

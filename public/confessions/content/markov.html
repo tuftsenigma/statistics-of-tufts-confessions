@@ -5,7 +5,7 @@
 
 <script>
 /* create matrix and map from data - HOST DEPENDENT */
-d3.csv('http://181.224.138.130/~trends37/wp-content/data/confessions/topic_markov.csv', function (error, data) {
+d3.csv('topic_markov.csv', function (error, data) {
     var mpr = chordMpr(data);
     mpr
       .addValuesToMap('from')
