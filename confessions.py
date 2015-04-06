@@ -28,49 +28,6 @@ from 	matplotlib			import pyplot as plt
 """
 Scripts used for 'TuftsConfessions' analysis
 
-DATA TO GET:
-1. popular words - top trigrams vs specific Tufts trigrams x
-2. sentiment score vs frequency vis - get most popular trigrams per bracket x
-3. LDA into good topics and map against popularity vs sentiment - x NO PATTERN
-4. bubble visualization of topics w/words and populatiries 
-5. how sentiment changes over a really long post
-6. overlaps between topics - directed graph of conditional distributions
-7. weekly, monthly, yearly trends - peaks in postage + particular topics / words over time
-8. correlation between sentiment and likes (?) - look at posts that have the most likes and analyze data
-
-INSIGHTS / QUESTIONS:
-0. Language patterns in confessions
-1. Tufts Confessions... sums us up pretty well
-2. Our Confessions are depressing and it has to do with place
-3. what are patterns over time in topics and popularity? data 4
-4. what do people actually like on tufts confessions? is there a pattern? data 5
-
-FUTURE QUESTIONS TO ASK:
-1. what are dichotomies? love vs sex, beautiful vs hot
-2. comparisons between schools
-
-
-Mongo cmds:
-
-connect =
-'mongo ds031651.mongolab.com:31651/tufts_trends -u trends_admin -p jumboni'
-
-query =
-'db.TuftsConfessions.find( { $text : { $search : <text query> }})'
-
-count = 
-'db.TuftsConfessions.count( { $text : { $search : <text query> }})'
-"""
-
-
-# Data store
-dbusr 	= 'trends_admin'
-dbpsswd = 'jumboni'
-dbhost  = 'ds031651.mongolab.com'
-dbport  = 31651
-dbname 	= 'tufts_trends'
-
-DB = DBCloudStore(host=dbhost, port=dbport, db=dbname, usr=dbusr, psswd=dbpsswd) 
 
 def model_topics(docs, terms, num_topics):
 	'''Run Latent Dirichlet Allocation on docs x terms'''
